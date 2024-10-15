@@ -1,0 +1,18 @@
+﻿{
+  "profiles": {
+    "DunGen": {
+      "commandName": "Executable",
+      "workingDirectory": "E:/Projects/Game Dev/Flax/DungeonGenerator",
+      "executablePath": "E:/Game Development/Flax/Flax_master/Binaries/Editor/Win64/Development/FlaxEditor.exe",
+      "commandLineArgs": "-project \"E:/Projects/Game Dev/Flax/DungeonGenerator\"",
+      "nativeDebugging": false
+    },
+    "DunGenEditor": {
+      "commandName": "Executable",
+      "workingDirectory": "E:/Projects/Game Dev/Flax/DungeonGenerator",
+      "executablePath": "E:/Game Development/Flax/Flax_master/Binaries/Editor/Win64/Development/FlaxEditor.exe",
+      "commandLineArgs": "-project \"E:/Projects/Game Dev/Flax/DungeonGenerator\"",
+      "nativeDebugging": false
+    }
+  }
+}
