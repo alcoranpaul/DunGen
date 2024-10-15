@@ -6,6 +6,7 @@ using FlaxEditor;
 using FlaxEditor.Content;
 using FlaxEditor.CustomEditors;
 using FlaxEditor.CustomEditors.Elements;
+using FlaxEditor.GUI.Docking;
 using FlaxEngine;
 using FlaxEngine.GUI;
 
@@ -23,15 +24,16 @@ public class DunGenWindow : CustomEditorWindow
 	public string SettingsPath => Path.Combine(Globals.ProjectContentFolder + "/" + SETTINGS_PATH_FOLDER, SETTINGS_NAME + ".json");
 
 	public bool EnableDebugDraw = false;
-	private string repoURL = "";
+	private readonly string repoURL = "";
 
 	public DunGenWindow(PluginDescription description)
 	{
+		Debug.Log($"DunGenWindow Constructor");
 		repoURL = description.RepositoryUrl;
 	}
 	public override void Initialize(LayoutElementsContainer layout)
 	{
-
+		Debug.Log($"DunGenWindow Initialized");
 		layout.Label("Dungeon Generation (DunGen)", TextAlignment.Center);
 		layout.Space(20);
 
@@ -72,19 +74,49 @@ public class DunGenWindow : CustomEditorWindow
 		saveButton.Button.TextColorHighlighted = Color.Black;
 		saveButton.Button.Bold = true;
 		saveButton.Button.Clicked += OpenData;
+
 		layout.Space(10);
+		var dungeonDataButton = layout.Button("Generate Dungeon Data", Color.DarkRed);
+		dungeonDataButton.Button.Clicked += GenerateData;
 
-		var generateButton = layout.Button("Generate Dungeon", Color.DarkGreen);
-		generateButton.Button.Clicked += GenerateDungeon;
+		layout.Space(10);
+		var spawnRoomsButton = layout.Button("Spawn Rooms", Color.DarkRed);
+		spawnRoomsButton.Button.Clicked += SpawnRooms;
 
+		layout.Space(10);
+		var spawnHallwaysButton = layout.Button("Spawn Hallways", Color.DarkRed);
+		spawnHallwaysButton.Button.Clicked += SpawnHallways;
+
+		layout.Space(10);
 		var destroyButton = layout.Button("Destroy Dungeon", Color.DarkRed);
 		destroyButton.Button.Clicked += DestroyDungeon;
+
+		layout.Space(15);
+		var generateButton = layout.Button("Generate Final Dungeon", Color.DarkGreen, "Generate the final version of the dungeon");
+		generateButton.Button.Clicked += GenerateDungeon;
+
 
 		layout.Space(20);
 		var githubButton = layout.Button("Open Github Repository", Color.DarkKhaki);
 		githubButton.Button.Clicked += OpenGitHub;
 		githubButton.Button.TextColor = Color.Black;
 		githubButton.Button.TextColorHighlighted = Color.Black;
+	}
+
+
+	private void SpawnHallways()
+	{
+
+	}
+
+	private void SpawnRooms()
+	{
+
+	}
+
+	private void GenerateData()
+	{
+
 	}
 
 	private void ToggleDebugDraw(CheckBox box)

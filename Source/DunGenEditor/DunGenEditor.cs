@@ -7,6 +7,7 @@ using FlaxEditor;
 using FlaxEditor.Content;
 using FlaxEditor.Content.Settings;
 using FlaxEditor.GUI;
+using FlaxEditor.GUI.Docking;
 using FlaxEngine;
 namespace DunGenEditor;
 
@@ -16,12 +17,14 @@ namespace DunGenEditor;
 
 public class DunGenEditor : EditorPlugin
 {
-	private CustomSettingsProxy assetProxy;
 	private const string SETTINGS_NAME = "DunGenSettings";
 	private const string SETTINGS_PATH_FOLDER = "/Data";
 	public static string SettingsPath => Path.Combine(Globals.ProjectContentFolder + SETTINGS_PATH_FOLDER, SETTINGS_NAME + ".json");
 
 	private ToolStripButton _button;
+
+	private DunGenWindow dunGenWindow;
+	private bool isWindowShown;
 
 	public DunGenEditor()
 	{
@@ -44,9 +47,25 @@ public class DunGenEditor : EditorPlugin
 	public override void InitializeEditor()
 	{
 		base.InitializeEditor();
-		_button = Editor.UI.ToolStrip.AddButton("DunGen");
-		_button.Clicked += () => new DunGenWindow(_description).Show();
 
+		isWindowShown = false;
+		_button = Editor.UI.ToolStrip.AddButton("DunGen");
+		dunGenWindow = new DunGenWindow(_description);
+		ShowEditorWindow();
+
+		_button.Clicked += ShowEditorWindow;
+
+	}
+
+	private void ShowEditorWindow()
+	{
+		if (isWindowShown) return;
+
+		if (dunGenWindow == null)
+			dunGenWindow = new DunGenWindow(_description);
+		dunGenWindow.Show(DockState.DockFill, Editor.Instance.Windows.ToolboxWin.ParentDockPanel, false);
+
+		isWindowShown = true;
 	}
 
 	/// <inheritdoc />
@@ -58,7 +77,11 @@ public class DunGenEditor : EditorPlugin
 			_button = null;
 		}
 
-		// Debug.Log("DunGenEditor Deinitialize");
+		if (dunGenWindow != null)
+		{
+			dunGenWindow = null;
+		}
+
 		base.DeinitializeEditor();
 	}
 }
