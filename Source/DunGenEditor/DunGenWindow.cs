@@ -172,6 +172,34 @@ public class DunGenWindow : CustomEditorWindow
 		settings.ShellExecute = true;
 		settings.LogOutput = false;
 		settings.WaitForEnd = false;
+
+		Platform.CreateProcess(ref settings);
+
+
+	}
+
+	private void UpdatePlugin()
+	{
+		// TODO: Implement the update process
+		// Define the URL and the output file path
+		string url = "https://raw.githubusercontent.com/username/repo/branch/file.txt";
+		string savePath = "C:/Your/Desired/Path/file.txt";
+
+		// Set up the CreateProcessSettings for the curl command
+		var settings = new CreateProcessSettings
+		{
+			FileName = "curl",  // Use 'curl' for downloading files
+			Arguments = $"-o \"{savePath}\" \"{url}\"",  // Arguments for saving the file
+			WorkingDirectory = "",  // You can set the working directory or leave it empty
+			LogOutput = true,  // Print the process output to the Flax log
+			SaveOutput = false,  // Don't save the process output into the Output array
+			WaitForEnd = true,  // Wait for the process to finish before proceeding
+			HiddenWindow = true,  // Hide the window (supported on Windows only)
+			ShellExecute = false,  // Don't use the operating system shell
+								   // Environment = new Dictionary<string, string>()  // You can set custom environment variables here if needed
+		};
+
+		// Run the process
 		Platform.CreateProcess(ref settings);
 	}
 
@@ -186,7 +214,7 @@ public class DunGenWindow : CustomEditorWindow
 
 			Editor.SaveJsonAsset(DunGenEditor.SettingsPath, new DungeonGenSettings());
 			var asd = Content.LoadAsync<JsonAsset>(DunGenEditor.SettingsPath);
-			GameSettings.SetCustomSettings("MyPlugin", Content.LoadAsync<JsonAsset>(DunGenEditor.SettingsPath));
+			GameSettings.SetCustomSettings(DunGenEditor.SETTINGS_NAME, Content.LoadAsync<JsonAsset>(DunGenEditor.SettingsPath));
 			MessageBox.Show($"Newly created settings @ {path}");
 			MessageBox.Show($"You can now open settings via the DunGen Window");
 			return;
