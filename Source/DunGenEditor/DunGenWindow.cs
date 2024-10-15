@@ -4,6 +4,7 @@ using System.IO;
 using DunGen;
 using FlaxEditor;
 using FlaxEditor.Content;
+using FlaxEditor.Content.Settings;
 using FlaxEditor.CustomEditors;
 using FlaxEditor.CustomEditors.Elements;
 using FlaxEditor.GUI.Docking;
@@ -19,21 +20,17 @@ public class DunGenWindow : CustomEditorWindow
 {
 
 
-	private const string SETTINGS_NAME = "DunGenSettings";
-	public string SETTINGS_PATH_FOLDER = "Data";
-	public string SettingsPath => Path.Combine(Globals.ProjectContentFolder + "/" + SETTINGS_PATH_FOLDER, SETTINGS_NAME + ".json");
-
 	public bool EnableDebugDraw = false;
 	private readonly string repoURL = "";
 
 	public DunGenWindow(PluginDescription description)
 	{
-		Debug.Log($"DunGenWindow Constructor");
+		// Debug.Log($"DunGenWindow Constructor");
 		repoURL = description.RepositoryUrl;
 	}
 	public override void Initialize(LayoutElementsContainer layout)
 	{
-		Debug.Log($"DunGenWindow Initialized");
+		// Debug.Log($"DunGenWindow Initialized");
 		layout.Label("Dungeon Generation (DunGen)", TextAlignment.Center);
 		layout.Space(20);
 
@@ -46,7 +43,7 @@ public class DunGenWindow : CustomEditorWindow
 		settingsGroup.AddElement(settingNameHP);
 
 		settingNameHP.AddElement(CreateLabel(layout, $"Settings Name:", marginLeft: 5));
-		settingNameHP.AddElement(CreateTextBox(layout, SETTINGS_NAME, textboxEnabled: false));
+		settingNameHP.AddElement(CreateTextBox(layout, DunGenEditor.SETTINGS_NAME, textboxEnabled: false));
 
 		var settingFolderHP = layout.HorizontalPanel();
 		settingFolderHP.ContainerControl.Height = 20f;
@@ -54,7 +51,7 @@ public class DunGenWindow : CustomEditorWindow
 		settingsGroup.AddElement(settingFolderHP);
 
 		settingFolderHP.AddElement(CreateLabel(layout, $"Settings Folder:", marginLeft: 5));
-		settingFolderHP.AddElement(CreateTextBox(layout, SETTINGS_PATH_FOLDER, tooltip: "The folder where the settings is located"));
+		settingFolderHP.AddElement(CreateTextBox(layout, DunGenEditor.SETTINGS_PATH_FOLDER, tooltip: "The folder where the settings is located"));
 
 		var enabbleDebugHP = layout.HorizontalPanel();
 		enabbleDebugHP.ContainerControl.Height = 20f;
@@ -69,7 +66,7 @@ public class DunGenWindow : CustomEditorWindow
 
 		// Buttons group - Load, Save, Generate
 		layout.Space(20);
-		var saveButton = layout.Button("Open Settings", Color.DarkGray, $"Open settings file @ {SettingsPath}");
+		var saveButton = layout.Button("Open Settings", Color.DarkGray, $"Open settings file @ {DunGenEditor.SettingsPath}");
 		saveButton.Button.TextColor = Color.Black;
 		saveButton.Button.TextColorHighlighted = Color.Black;
 		saveButton.Button.Bold = true;
@@ -180,12 +177,25 @@ public class DunGenWindow : CustomEditorWindow
 
 	private void OpenData()
 	{
-		var asset = Content.Load(SettingsPath);
-		if (asset == null) Debug.LogWarning($"Failed to load settings @ {SettingsPath}");
-		// TODO: Add auto create settings if a bool is enabled
+		var asset = Content.Load(DunGenEditor.SettingsPath);
+		if (asset == null)
+		{
+			string path = $"../Content{DunGenEditor.SETTINGS_PATH_FOLDER}/{DunGenEditor.SETTINGS_NAME}.json";
+			Debug.LogWarning($"Failed to load settings @ {DunGenEditor.SettingsPath} ");
 
-		if (asset is not JsonAsset) Debug.LogWarning($"Settings @ {SettingsPath} is not a JsonAsset");
+
+			Editor.SaveJsonAsset(DunGenEditor.SettingsPath, new DungeonGenSettings());
+			var asd = Content.LoadAsync<JsonAsset>(DunGenEditor.SettingsPath);
+			GameSettings.SetCustomSettings("MyPlugin", Content.LoadAsync<JsonAsset>(DunGenEditor.SettingsPath));
+			MessageBox.Show($"Newly created settings @ {path}");
+			MessageBox.Show($"You can now open settings via the DunGen Window");
+			return;
+		}
+
+
+		if (asset is not JsonAsset) Debug.LogWarning($"Settings @ {DunGenEditor.SettingsPath} is not a JsonAsset");
 		Editor.Instance.ContentEditing.Open(asset);
+
 	}
 
 

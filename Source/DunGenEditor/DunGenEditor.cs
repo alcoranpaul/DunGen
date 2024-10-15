@@ -2,10 +2,8 @@
 
 using System;
 using System.IO;
-using DunGen;
 using FlaxEditor;
-using FlaxEditor.Content;
-using FlaxEditor.Content.Settings;
+
 using FlaxEditor.GUI;
 using FlaxEditor.GUI.Docking;
 using FlaxEngine;
@@ -17,8 +15,8 @@ namespace DunGenEditor;
 
 public class DunGenEditor : EditorPlugin
 {
-	private const string SETTINGS_NAME = "DunGenSettings";
-	private const string SETTINGS_PATH_FOLDER = "/Data";
+	public static readonly string SETTINGS_NAME = "DunGenSettings";
+	public static readonly string SETTINGS_PATH_FOLDER = "/Data";
 	public static string SettingsPath => Path.Combine(Globals.ProjectContentFolder + SETTINGS_PATH_FOLDER, SETTINGS_NAME + ".json");
 
 	private ToolStripButton _button;
@@ -48,6 +46,7 @@ public class DunGenEditor : EditorPlugin
 	{
 		base.InitializeEditor();
 
+
 		isWindowShown = false;
 		_button = Editor.UI.ToolStrip.AddButton("DunGen");
 		dunGenWindow = new DunGenWindow(_description);
@@ -59,7 +58,12 @@ public class DunGenEditor : EditorPlugin
 
 	private void ShowEditorWindow()
 	{
-		if (isWindowShown) return;
+		if (isWindowShown)
+		{
+			if (Editor.Instance.Windows.ToolboxWin.ParentDockPanel.TabsCount > 1)
+				Editor.Instance.Windows.ToolboxWin.ParentDockPanel.SelectTab(1);
+			return;
+		}
 
 		if (dunGenWindow == null)
 			dunGenWindow = new DunGenWindow(_description);

@@ -21,9 +21,7 @@
 	"Localization": null,
 	"GameCooking": null,
 	"Streaming": null,
-	"CustomSettings": {
-		"MyPlugin": "687b65ff4e3bee640d41eb88cccd4ee3"
-	},
+	"CustomSettings": {},
 	"WindowsPlatform": null,
 	"UWPPlatform": null,
 	"LinuxPlatform": null,

@@ -1,0 +1,22 @@
+{
+	"ID": "687b65ff4e3bee640d41eb88cccd4ee3",
+	"TypeName": "DunGen.DungeonGenSettings",
+	"EngineBuild": 6605,
+	"Data": {
+	"MaxRooms": 10,
+	"Size": 10.0,
+	"BoundingBox": {
+		"Minimum": {
+			"X": 0.0,
+			"Y": 0.0,
+			"Z": 0.0
+		},
+		"Maximum": {
+			"X": 0.0,
+			"Y": 0.0,
+			"Z": 0.0
+		}
+	},
+	"DebugSetting": null
+}
+}

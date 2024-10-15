@@ -1,0 +1,81 @@
+{
+	"ID": "0ebbdfb64061f4449ec058918c912312",
+	"TypeName": "FlaxEngine.SceneAsset",
+	"EngineBuild": 6605,
+	"Data": [
+		{
+			"ID": "0ebbdfb64061f4449ec058918c912312",
+			"TypeName": "FlaxEngine.Scene",
+			"LightmapSettings": {
+				"IndirectLightingIntensity": 1.0,
+				"GlobalObjectsScale": 1.0,
+				"ChartsPadding": 3,
+				"AtlasSize": 1024,
+				"BounceCount": 1,
+				"CompressLightmaps": true,
+				"UseGeometryWithNoMaterials": true,
+				"Quality": 10
+			}
+		},
+		{
+			"ID": "1f80b9594058c081e6c55382d064159e",
+			"TypeName": "FlaxEngine.DirectionalLight",
+			"ParentID": "0ebbdfb64061f4449ec058918c912312",
+			"Name": "Sun",
+			"Transform": {
+				"Translation": {
+					"X": 40.0,
+					"Y": 160.0,
+					"Z": 0.0
+				},
+				"Orientation": {
+					"X": 0.3826834559440613,
+					"Y": 0.0,
+					"Z": 0.0,
+					"W": 0.9238795042037964
+				}
+			}
+		},
+		{
+			"ID": "f66b3ae74a27e6890cd27184ebdb9ead",
+			"TypeName": "FlaxEngine.Sky",
+			"ParentID": "0ebbdfb64061f4449ec058918c912312",
+			"Name": "Sky",
+			"Transform": {
+				"Translation": {
+					"X": 40.0,
+					"Y": 150.0,
+					"Z": 0.0
+				}
+			},
+			"Sun": "1f80b9594058c081e6c55382d064159e"
+		},
+		{
+			"ID": "2233f73c43da9e7ea1ee968d7e874899",
+			"TypeName": "FlaxEngine.SkyLight",
+			"ParentID": "0ebbdfb64061f4449ec058918c912312",
+			"Name": "SkyLight",
+			"Brightness": 2.5,
+			"CustomTexture": "c54410104ff39427bc11e5bc761d66b0"
+		},
+		{
+			"ID": "71f2baa241a16caf92cd738da2a27662",
+			"TypeName": "FlaxEngine.Camera",
+			"ParentID": "0ebbdfb64061f4449ec058918c912312",
+			"Name": "Camera",
+			"Transform": {
+				"Translation": {
+					"X": 0.0,
+					"Y": 150.0,
+					"Z": -300.0
+				}
+			}
+		},
+		{
+			"ID": "6d69b10d4161f9a7e8c2dab43b906900",
+			"TypeName": "FlaxEngine.AudioListener",
+			"ParentID": "71f2baa241a16caf92cd738da2a27662",
+			"Name": "Audio Listener"
+		}
+	]
+}

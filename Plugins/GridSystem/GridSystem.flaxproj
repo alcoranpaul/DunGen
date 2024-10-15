@@ -1,16 +1,13 @@
 ﻿{
-	"Name": "DunGen",
+	"Name": "GridSystem",
 	"Version": "1.0",
-	"Company": "",
+	"Company": "D1g1Talino",
 	"Copyright": "",
-	"GameTarget": "DunGenTarget",
-	"EditorTarget": "DunGenEditorTarget",
+	"GameTarget": "GridSystemTarget",
+	"EditorTarget": "GridSystemEditorTarget",
 	"References": [
 		{
 			"Name": "$(EnginePath)/Flax.flaxproj"
-		},
-		{
-			"Name": "$(ProjectPath)/Plugins/GridSystem/GridSystem.flaxproj"
 		}
 	],
 	"DefaultScene": null,
