@@ -1,0 +1,198 @@
+{
+	"ID": "b71b10e044f0a7eb83c1a99fda4c90a1",
+	"TypeName": "FlaxEngine.Prefab",
+	"EngineBuild": 6605,
+	"Data": [
+	{
+		"ID": "b24373b14ad0677abb1eada569907ddc",
+		"TypeName": "FlaxEngine.EmptyActor",
+		"Name": "DebugObject",
+		"StaticFlags": 0
+	},
+	{
+		"ID": "d03342f545a9ff8e07a3768a0987b7e3",
+		"TypeName": "Game.PathfindingDebugObject",
+		"ParentID": "b24373b14ad0677abb1eada569907ddc",
+		"V": {
+	"gCost": "e5f4f0fb4c43493befc5f29f279b0954",
+	"hCost": "2ab28f704fbef9690e6ffa819742cdcd",
+	"fCost": "148c82ab4d0bbfdad164929c9d5c440e",
+	"TextRender": "b891eb80456798a589cc01a55af24a83"
+}
+	},
+	{
+		"ID": "b891eb80456798a589cc01a55af24a83",
+		"TypeName": "FlaxEngine.TextRender",
+		"ParentID": "b24373b14ad0677abb1eada569907ddc",
+		"Name": "Position",
+		"Transform": {
+			"Translation": {
+				"X": 0.0,
+				"Y": 5.0,
+				"Z": 0.0
+			},
+			"Orientation": {
+				"X": -0.7071068286895752,
+				"Y": 0.0,
+				"Z": 0.0,
+				"W": 0.7071068286895752
+			}
+		},
+		"StaticFlags": 0,
+		"Text": "1,1",
+		"Color": {
+			"R": 0.0,
+			"G": 0.0,
+			"B": 0.0,
+			"A": 1.0
+		},
+		"Size": 18.0,
+		"Material": "e72782bd4d898e2f236ca3be780438af",
+		"Font": "4508d98f4aa1f0bd59362b81d47e38f4",
+		"ShadowsMode": 0,
+		"DrawModes": 2,
+		"Bounds": {
+			"Location": {
+				"X": -50.0,
+				"Y": -50.0
+			},
+			"Size": {
+				"X": 100.0,
+				"Y": 100.0
+			}
+		}
+	},
+	{
+		"ID": "2ab28f704fbef9690e6ffa819742cdcd",
+		"TypeName": "FlaxEngine.TextRender",
+		"ParentID": "b24373b14ad0677abb1eada569907ddc",
+		"Name": "hCost",
+		"Transform": {
+			"Translation": {
+				"X": -25.0,
+				"Y": 5.0,
+				"Z": 25.0
+			},
+			"Orientation": {
+				"X": -0.7071068286895752,
+				"Y": 0.0,
+				"Z": 0.0,
+				"W": 0.7071068286895752
+			}
+		},
+		"StaticFlags": 0,
+		"Text": "1,1sssss",
+		"Color": {
+			"R": 0.0,
+			"G": 0.0,
+			"B": 0.0,
+			"A": 1.0
+		},
+		"Size": 8.0,
+		"Material": "e72782bd4d898e2f236ca3be780438af",
+		"Font": "4508d98f4aa1f0bd59362b81d47e38f4",
+		"ShadowsMode": 0,
+		"DrawModes": 2,
+		"Bounds": {
+			"Location": {
+				"X": -25.0,
+				"Y": -25.0
+			},
+			"Size": {
+				"X": 50.0,
+				"Y": 50.0
+			}
+		},
+		"HAlignment": 0,
+		"Wrapping": 2
+	},
+	{
+		"ID": "e5f4f0fb4c43493befc5f29f279b0954",
+		"TypeName": "FlaxEngine.TextRender",
+		"ParentID": "b24373b14ad0677abb1eada569907ddc",
+		"Name": "gCost",
+		"Transform": {
+			"Translation": {
+				"X": 25.0,
+				"Y": 5.0,
+				"Z": -25.0
+			},
+			"Orientation": {
+				"X": -0.7071068286895752,
+				"Y": 0.0,
+				"Z": 0.0,
+				"W": 0.7071068286895752
+			}
+		},
+		"StaticFlags": 0,
+		"Text": "1,1sssss",
+		"Color": {
+			"R": 0.0,
+			"G": 0.0,
+			"B": 0.0,
+			"A": 1.0
+		},
+		"Size": 8.0,
+		"Material": "e72782bd4d898e2f236ca3be780438af",
+		"Font": "4508d98f4aa1f0bd59362b81d47e38f4",
+		"ShadowsMode": 0,
+		"DrawModes": 2,
+		"Bounds": {
+			"Location": {
+				"X": -25.0,
+				"Y": -25.0
+			},
+			"Size": {
+				"X": 50.0,
+				"Y": 50.0
+			}
+		},
+		"HAlignment": 0,
+		"Wrapping": 2
+	},
+	{
+		"ID": "148c82ab4d0bbfdad164929c9d5c440e",
+		"TypeName": "FlaxEngine.TextRender",
+		"ParentID": "b24373b14ad0677abb1eada569907ddc",
+		"Name": "fCost",
+		"Transform": {
+			"Translation": {
+				"X": 25.0,
+				"Y": 5.0,
+				"Z": 25.0
+			},
+			"Orientation": {
+				"X": -0.7071068286895752,
+				"Y": 0.0,
+				"Z": 0.0,
+				"W": 0.7071068286895752
+			}
+		},
+		"StaticFlags": 0,
+		"Text": "1,1sssss",
+		"Color": {
+			"R": 0.0,
+			"G": 0.0,
+			"B": 0.0,
+			"A": 1.0
+		},
+		"Size": 8.0,
+		"Material": "e72782bd4d898e2f236ca3be780438af",
+		"Font": "4508d98f4aa1f0bd59362b81d47e38f4",
+		"ShadowsMode": 0,
+		"DrawModes": 2,
+		"Bounds": {
+			"Location": {
+				"X": -25.0,
+				"Y": -25.0
+			},
+			"Size": {
+				"X": 50.0,
+				"Y": 50.0
+			}
+		},
+		"HAlignment": 0,
+		"Wrapping": 2
+	}
+]
+}

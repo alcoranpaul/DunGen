@@ -1,0 +1,59 @@
+{
+	"ID": "ee36236c42c3ab7ccb8988b493f6974a",
+	"TypeName": "FlaxEngine.Prefab",
+	"EngineBuild": 6605,
+	"Data": [
+	{
+		"ID": "b24373b14ad0677abb1eada569907ddc",
+		"TypeName": "FlaxEngine.EmptyActor",
+		"Name": "DebugObject"
+	},
+	{
+		"ID": "f24e2267402c9939193d1994b934126e",
+		"TypeName": "Game.GridDebugObject",
+		"ParentID": "b24373b14ad0677abb1eada569907ddc",
+		"V": {
+	"TextRender": "b891eb80456798a589cc01a55af24a83"
+}
+	},
+	{
+		"ID": "b891eb80456798a589cc01a55af24a83",
+		"TypeName": "FlaxEngine.TextRender",
+		"ParentID": "b24373b14ad0677abb1eada569907ddc",
+		"Name": "TextRender",
+		"Transform": {
+			"Translation": {
+				"X": 0.0,
+				"Y": 5.0,
+				"Z": 0.0
+			},
+			"Orientation": {
+				"X": -0.7071068286895752,
+				"Y": 0.0,
+				"Z": 0.0,
+				"W": 0.7071068286895752
+			}
+		},
+		"Text": "1,1",
+		"Color": {
+			"R": 0.0,
+			"G": 0.0,
+			"B": 0.0,
+			"A": 1.0
+		},
+		"Size": 18.0,
+		"Material": "e72782bd4d898e2f236ca3be780438af",
+		"Font": "4508d98f4aa1f0bd59362b81d47e38f4",
+		"Bounds": {
+			"Location": {
+				"X": -50.0,
+				"Y": -50.0
+			},
+			"Size": {
+				"X": 100.0,
+				"Y": 100.0
+			}
+		}
+	}
+]
+}

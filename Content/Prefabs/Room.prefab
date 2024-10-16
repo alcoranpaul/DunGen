@@ -1,0 +1,34 @@
+{
+	"ID": "f3d896034ca9a3f0966afe81c047c45e",
+	"TypeName": "FlaxEngine.Prefab",
+	"EngineBuild": 6605,
+	"Data": [
+	{
+		"ID": "e76af0b2425540e892b625b3f859cc9a",
+		"TypeName": "FlaxEngine.StaticModel",
+		"ParentID": "00000000000000000000000000000000",
+		"Name": "Room",
+		"Tags": [
+			"Pathfinding.Obstacle",
+			"Room"
+		],
+		"Model": "b43f0f8f4aaba3f3156896a5a22ba493",
+		"Buffer": {
+			"Entries": [
+				{
+					"Material": "00000000000000000000000000000000",
+					"ShadowsMode": 3,
+					"Visible": true,
+					"ReceiveDecals": true
+				}
+			]
+		}
+	},
+	{
+		"ID": "ba3126ab46e0f244eee6db8300f6dbaa",
+		"TypeName": "FlaxEngine.BoxCollider",
+		"ParentID": "e76af0b2425540e892b625b3f859cc9a",
+		"Name": "BoxCollider"
+	}
+]
+}
