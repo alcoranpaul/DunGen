@@ -17,7 +17,12 @@ public class DunGenEditor : EditorPlugin
 {
 	public static readonly string SETTINGS_NAME = "DunGenSettings";
 	public static readonly string SETTINGS_PATH_FOLDER = "/Data";
+	public static readonly string DEBUG_PREFAB_FOLDER = "/Debugging";
+	public static string DebugPath => Path.Combine(Globals.ProjectContentFolder + DEBUG_PREFAB_FOLDER);
 	public static string SettingsPath => Path.Combine(Globals.ProjectContentFolder + SETTINGS_PATH_FOLDER, SETTINGS_NAME + ".json");
+
+
+
 
 	private ToolStripButton _button;
 

@@ -1,5 +1,6 @@
 ﻿#if FLAX_EDITOR
 using System;
+using System.Collections.Generic;
 using System.IO;
 using DunGen;
 using FlaxEditor;
@@ -18,7 +19,15 @@ namespace DunGenEditor;
 /// </summary>
 public class DunGenWindow : CustomEditorWindow
 {
+	// TODO: make editable via editor
+	public string DEBUG_GRID_PREFAB_NAME = "DebugGrid";
+	public string PATH_NODE_DEBUG_PREFAB_NAME = "PathNodeDebugObject";
+	public string ROOM_PREFAB_NAME = "Room";
+	public string FLOOR_PREFAB_NAME = "Floor";
+	public string ROOM_MATERIAL_NAME = "Debug Rooms";
 
+	public const string PREFAB_FOLDER_NAME = "Prefabs";
+	public const string MATERIAL_FOLDER_NAME = "Material";
 
 	public bool EnableDebugDraw = false;
 	private readonly string repoURL = "";
@@ -31,6 +40,7 @@ public class DunGenWindow : CustomEditorWindow
 	public override void Initialize(LayoutElementsContainer layout)
 	{
 		// Debug.Log($"DunGenWindow Initialized");
+		GetDebugAssets();
 		layout.Label("Dungeon Generation (DunGen)", TextAlignment.Center);
 		layout.Space(20);
 
@@ -206,24 +216,102 @@ public class DunGenWindow : CustomEditorWindow
 	private void OpenData()
 	{
 		var asset = Content.Load(DunGenEditor.SettingsPath);
-		if (asset == null)
+		if (asset == null) // If the asset is not found, create a new settings file
 		{
 			string path = $"../Content{DunGenEditor.SETTINGS_PATH_FOLDER}/{DunGenEditor.SETTINGS_NAME}.json";
 			Debug.LogWarning($"Failed to load settings @ {DunGenEditor.SettingsPath} ");
 
+			DungeonGenSettings settings = new DungeonGenSettings();
+			settings.DebugSetting = GetDebugAssets();
 
-			Editor.SaveJsonAsset(DunGenEditor.SettingsPath, new DungeonGenSettings());
-			var asd = Content.LoadAsync<JsonAsset>(DunGenEditor.SettingsPath);
+			Editor.SaveJsonAsset(DunGenEditor.SettingsPath, settings);
 			GameSettings.SetCustomSettings(DunGenEditor.SETTINGS_NAME, Content.LoadAsync<JsonAsset>(DunGenEditor.SettingsPath));
-			MessageBox.Show($"Newly created settings @ {path}");
-			MessageBox.Show($"You can now open settings via the DunGen Window");
+
+			MessageBox.Show($"Newly created settings @ {path}\n You can now open settings via the DunGen Window");
 			return;
 		}
 
 
 		if (asset is not JsonAsset) Debug.LogWarning($"Settings @ {DunGenEditor.SettingsPath} is not a JsonAsset");
+		// Open the settings asset in the editor
 		Editor.Instance.ContentEditing.Open(asset);
 
+	}
+
+	private DungeonGenSettings.DebugSettings GetDebugAssets()
+	{
+		// Construct the paths to the prefab and material directories based on the DunGenEditor.DebugPath
+		string prefabPath = Path.Combine(DunGenEditor.DebugPath, PREFAB_FOLDER_NAME);
+		string materialPath = Path.Combine(DunGenEditor.DebugPath, MATERIAL_FOLDER_NAME);
+
+		// Check if the material and prefab directories exist, and log warnings if they don't
+		if (!Directory.Exists(materialPath)) Debug.LogWarning($"Debug Material Path does not exist @ {materialPath}");
+		if (!Directory.Exists(prefabPath)) Debug.LogWarning($"Debug Prefab Path does not exist @ {prefabPath}");
+
+		// Initialize an empty DebugSettings object to hold the loaded assets
+		DungeonGenSettings.DebugSettings debugSettings = new DungeonGenSettings.DebugSettings();
+
+		// ------------------ Load Debug Materials ------------------
+
+		// Get all material files from the material directory (including subdirectories)
+		string[] materialFiles = Directory.GetFiles(materialPath, "*", SearchOption.AllDirectories);
+		List<Material> debugMaterials = new List<Material>();
+
+		// Iterate through each material file, retrieve its asset information, and load it asynchronously
+		foreach (string file in materialFiles)
+		{
+			if (!Content.GetAssetInfo(file, out var assetInfo)) continue; // Skip if asset info is not found
+			debugMaterials.Add(Content.LoadAsync<Material>(assetInfo.Path));
+		}
+
+		// Assign the room material if the file name matches the predefined ROOM_MATERIAL_NAME
+		foreach (var item in debugMaterials)
+		{
+			string fileName = Path.GetFileNameWithoutExtension(item.Path);
+			if (fileName == ROOM_MATERIAL_NAME) // Check for the specific material used for the room
+			{
+				debugSettings.Material = item; // Set the room material in the debug settings
+			}
+		}
+
+		// ------------------ Load Debug Prefabs ------------------
+
+		// Get all prefab files from the prefab directory (including subdirectories)
+		string[] prefabFiles = Directory.GetFiles(prefabPath, "*.prefab", SearchOption.AllDirectories);
+		List<Prefab> debugPrefabs = new List<Prefab>();
+
+		// Iterate through each prefab file, retrieve its asset information, and load it asynchronously
+		foreach (string file in prefabFiles)
+		{
+			if (!Content.GetAssetInfo(file, out var assetInfo)) continue; // Skip if asset info is not found
+			debugPrefabs.Add(Content.LoadAsync<Prefab>(assetInfo.Path));
+		}
+
+		// Assign the appropriate prefab to the corresponding field in the debug settings based on the file name
+		foreach (var item in debugPrefabs)
+		{
+			string fileName = Path.GetFileNameWithoutExtension(item.Path);
+
+			if (fileName == DEBUG_GRID_PREFAB_NAME)
+			{
+				debugSettings.DebugGridPrefab = item; // Set the debug grid prefab
+			}
+			else if (fileName == PATH_NODE_DEBUG_PREFAB_NAME)
+			{
+				debugSettings.PathfindingDebugPrefab = item; // Set the pathfinding debug object prefab
+			}
+			else if (fileName == ROOM_PREFAB_NAME)
+			{
+				debugSettings.RoomPrefab = item; // Set the room prefab
+			}
+			else if (fileName == FLOOR_PREFAB_NAME)
+			{
+				debugSettings.FloorPrefab = item; // Set the floor prefab
+			}
+		}
+
+		// Return the populated debug settings containing all the necessary prefabs and materials
+		return debugSettings;
 	}
 
 

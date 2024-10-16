@@ -1,5 +1,5 @@
 {
-	"ID": "13fe91004384831f98d89aad7adc9c8a",
+	"ID": "e48967be4ea710de4522df8a693ffae5",
 	"TypeName": "DunGen.DungeonGenSettings",
 	"EngineBuild": 6605,
 	"Data": {
@@ -17,6 +17,12 @@
 			"Z": 0.0
 		}
 	},
-	"DebugSetting": null
+	"DebugSetting": {
+		"Material": "566a25c44be00c35525b0f98d34a9d93",
+		"DebugGridPrefab": "ee36236c42c3ab7ccb8988b493f6974a",
+		"PathfindingDebugPrefab": "b71b10e044f0a7eb83c1a99fda4c90a1",
+		"RoomPrefab": "f3d896034ca9a3f0966afe81c047c45e",
+		"FloorPrefab": "3e10e49441a0137931b654a1c18b11b7"
+	}
 }
 }
