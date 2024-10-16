@@ -6,7 +6,6 @@
 	{
 		"ID": "e76af0b2425540e892b625b3f859cc9a",
 		"TypeName": "FlaxEngine.StaticModel",
-		"ParentID": "00000000000000000000000000000000",
 		"Name": "Room",
 		"Tags": [
 			"Pathfinding.Obstacle",

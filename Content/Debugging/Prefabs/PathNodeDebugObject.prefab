@@ -10,12 +10,12 @@
 		"StaticFlags": 0
 	},
 	{
-		"ID": "d03342f545a9ff8e07a3768a0987b7e3",
-		"TypeName": "Game.PathfindingDebugObject",
+		"ID": "244e6af940bb52eaca0045a3f8901e08",
+		"TypeName": "DunGen.PathfindingDebugObject",
 		"ParentID": "b24373b14ad0677abb1eada569907ddc",
 		"V": {
-	"gCost": "e5f4f0fb4c43493befc5f29f279b0954",
-	"hCost": "2ab28f704fbef9690e6ffa819742cdcd",
+	"gCost": "2ab28f704fbef9690e6ffa819742cdcd",
+	"hCost": "e5f4f0fb4c43493befc5f29f279b0954",
 	"fCost": "148c82ab4d0bbfdad164929c9d5c440e",
 	"TextRender": "b891eb80456798a589cc01a55af24a83"
 }

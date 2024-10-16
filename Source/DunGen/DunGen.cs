@@ -53,7 +53,7 @@ namespace DunGen
 		public void GenerateDungeon()
 		{
 			if (Generator != null)
-				Generator.GenerateDungeon();
+				Generator.GenerateFinalDungeon();
 		}
 	}
 

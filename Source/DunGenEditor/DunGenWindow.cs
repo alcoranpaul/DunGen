@@ -32,6 +32,9 @@ public class DunGenWindow : CustomEditorWindow
 	public bool EnableDebugDraw = false;
 	private readonly string repoURL = "";
 
+	private Generator generator;
+	private Action action;
+
 	public DunGenWindow(PluginDescription description)
 	{
 		// Debug.Log($"DunGenWindow Constructor");
@@ -40,7 +43,9 @@ public class DunGenWindow : CustomEditorWindow
 	public override void Initialize(LayoutElementsContainer layout)
 	{
 		// Debug.Log($"DunGenWindow Initialized");
-		GetDebugAssets();
+		// if (generator == null)
+		// 	generator = new Generator();
+
 		layout.Label("Dungeon Generation (DunGen)", TextAlignment.Center);
 		layout.Space(20);
 
@@ -83,16 +88,19 @@ public class DunGenWindow : CustomEditorWindow
 		saveButton.Button.Clicked += OpenData;
 
 		layout.Space(10);
-		var dungeonDataButton = layout.Button("Generate Dungeon Data", Color.DarkRed);
-		dungeonDataButton.Button.Clicked += GenerateData;
+		var dungeonDataButton = layout.Button("Generate Rooms", Color.DarkRed);
+		dungeonDataButton.Button.Enabled = false;
+		dungeonDataButton.Button.Clicked += () =>
+		{
+			// Issue #21
+			// action = () => dungeonDataButton.Button.Clicked -= () => GeneratePathfinding(dungeonDataButton);
+			// GeneratePathfinding(dungeonDataButton);
+
+		};
 
 		layout.Space(10);
-		var spawnRoomsButton = layout.Button("Spawn Rooms", Color.DarkRed);
-		spawnRoomsButton.Button.Clicked += SpawnRooms;
-
-		layout.Space(10);
-		var spawnHallwaysButton = layout.Button("Spawn Hallways", Color.DarkRed);
-		spawnHallwaysButton.Button.Clicked += SpawnHallways;
+		var spawnDebugButton = layout.Button("Spawn Debug Dungeon", Color.DarkRed);
+		spawnDebugButton.Button.Clicked += () => Generator.Instance.SpawnDebugDungeon();
 
 		layout.Space(10);
 		var destroyButton = layout.Button("Destroy Dungeon", Color.DarkRed);
@@ -100,7 +108,7 @@ public class DunGenWindow : CustomEditorWindow
 
 		layout.Space(15);
 		var generateButton = layout.Button("Generate Final Dungeon", Color.DarkGreen, "Generate the final version of the dungeon");
-		generateButton.Button.Clicked += GenerateDungeon;
+		generateButton.Button.Clicked += GenerateFinalDungeon;
 
 
 		layout.Space(20);
@@ -111,19 +119,73 @@ public class DunGenWindow : CustomEditorWindow
 	}
 
 
-	private void SpawnHallways()
+	private void GeneratePathfinding(ButtonElement button)
 	{
+		DestroyDungeon();
+		generator = new Generator();
+		generator.SetupActor();
+		generator.GeneratePathfinding();
+		Debug.Log($"Generate Pathfinding");
+		button.Button.Text = "Spawn Rooms";
+		action();
+		button.Button.Clicked += () => SpawnRooms(button);
+		action = () => button.Button.Clicked -= () => SpawnRooms(button);
+	}
+
+	private void SpawnRooms(ButtonElement button)
+	{
+
+		if (Generator.Instance == null)
+		{
+			Debug.LogWarning("Generator Instance is null");
+			return;
+		}
+		Debug.Log($"Spawn Rooms");
+		generator.GenerateRoomData();
+		button.Button.Text = "Connect Rooms";
+		action();
+		action = () => button.Button.Clicked -= () => ConnectRooms(button);
+		button.Button.Clicked += () => ConnectRooms(button);
+	}
+	private void ConnectRooms(ButtonElement button)
+	{
+
+		if (Generator.Instance == null)
+		{
+			Debug.LogWarning("Generator Instance is null");
+			return;
+		}
+		Debug.Log($"Connect Rooms");
+		generator.GenerateHallwayPaths();
+		Debug.Log($"GeneratePathfinding Pathfinding null: {generator.Pathfinding == null}");
+		button.Button.Text = "Generate Rooms";
+		action();
+		action = () => button.Button.Clicked -= () => SpawnRooms(button);
+
+		button.Button.Clicked += () => SpawnRooms(button);
 
 	}
 
-	private void SpawnRooms()
-	{
 
+	private void GenerateFinalDungeon()
+	{
+		DebugDraw.UpdateContext(IntPtr.Zero, float.MaxValue);
+		generator = new Generator();
+		generator.GenerateFinalDungeon();
+
+		if (!EnableDebugDraw)
+			DebugDraw.UpdateContext(IntPtr.Zero, float.MaxValue);
 	}
 
-	private void GenerateData()
+	private void DestroyDungeon()
 	{
-
+		DebugDraw.UpdateContext(IntPtr.Zero, float.MaxValue);
+		Actor DungeonGenActor = Level.FindActor("DungeonGenActor");
+		// If Actor has children, destroy them
+		if (DungeonGenActor != null && DungeonGenActor.ChildrenCount > 0)
+		{
+			DungeonGenActor.DestroyChildren();
+		}
 	}
 
 	private void ToggleDebugDraw(CheckBox box)
@@ -153,26 +215,7 @@ public class DunGenWindow : CustomEditorWindow
 		return retVal;
 	}
 
-	private void GenerateDungeon()
-	{
-		DebugDraw.UpdateContext(IntPtr.Zero, float.MaxValue);
-		Generator generator = new Generator();
-		generator.GenerateDungeon();
 
-		if (!EnableDebugDraw)
-			DebugDraw.UpdateContext(IntPtr.Zero, float.MaxValue);
-	}
-
-	private void DestroyDungeon()
-	{
-		DebugDraw.UpdateContext(IntPtr.Zero, float.MaxValue);
-		Actor DungeonGenActor = Level.FindActor("DungeonGenActor");
-		// If Actor has children, destroy them
-		if (DungeonGenActor != null && DungeonGenActor.ChildrenCount > 0)
-		{
-			DungeonGenActor.DestroyChildren();
-		}
-	}
 
 
 	private void OpenGitHub()

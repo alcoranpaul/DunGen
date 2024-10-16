@@ -4,7 +4,7 @@
 	"EngineBuild": 6605,
 	"Data": {
 	"MaxRooms": 10,
-	"Size": 10.0,
+	"Size": 30.0,
 	"BoundingBox": {
 		"Minimum": {
 			"X": 0.0,

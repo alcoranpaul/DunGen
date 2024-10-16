@@ -22,7 +22,7 @@ public class Generator
 	public Generator()
 	{
 		// Debug.Log("Generator Constructor");
-		if (Instance != null)
+		if (Instance == null)
 			Instance = this;
 
 		var settings = Engine.GetCustomSettings("DunGenSettings");
@@ -35,7 +35,7 @@ public class Generator
 		Rooms = new List<Room>();
 	}
 
-	public void GenerateDungeon()
+	public void GenerateFinalDungeon()
 	{
 		// Spawn an empty actor to hold the dungeon
 		DungeonGenActor = Level.FindActor(ACTOR_NAME);
@@ -51,17 +51,39 @@ public class Generator
 		ChangeState(DungeonGenState.Generating);
 
 		// Setup Grid plus Pathfinding
-		Pathfinding = new PathFinding(new Vector2(Settings.Size, Settings.Size));
-		Settings.BoundingBox = Pathfinding.GetBoundingBox();
+		GeneratePathfinding();
 
 		DestroyDungeon();
-		SpawnRooms();
+		GenerateRoomData();
 		GenerateHallwayPaths();
 
 		ChangeGeneratorState(GeneratorState.None);
 		ChangeState(DungeonGenState.None);
 		// Debug.Log("Dungeon generation complete");
 
+	}
+	public void SpawnDebugDungeon()
+	{
+		Pathfinding.SpawnDebugObjects(Settings.DebugSetting.PathfindingDebugPrefab);
+	}
+	public void SetupActor()
+	{
+		DungeonGenActor = Level.FindActor(ACTOR_NAME);
+		if (DungeonGenActor == null)
+		{
+			DungeonGenActor = new EmptyActor();
+			DungeonGenActor.Name = ACTOR_NAME;
+			Level.SpawnActor(DungeonGenActor);
+
+		}
+	}
+
+	public void GeneratePathfinding()
+	{
+		// Setup Grid plus Pathfinding
+		Pathfinding = new PathFinding(new Vector2(Settings.Size, Settings.Size));
+		Settings.BoundingBox = Pathfinding.GetBoundingBox();
+		// Debug.Log($"GeneratePathfinding Pathfinding null: {Pathfinding == null}");
 	}
 
 	public void DestroyDungeon()
@@ -90,8 +112,9 @@ public class Generator
 
 	}
 
-	private void SpawnRooms()
+	public void GenerateRoomData()
 	{
+		// Debug.Log($"Pathfinding null: {Pathfinding == null}");
 		ChangeGeneratorState(GeneratorState.SpawningRooms);
 		for (int i = 0; i < Settings.MaxRooms; i++)
 		{
@@ -184,7 +207,7 @@ public class Generator
 
 	}
 
-	private void GenerateHallwayPaths()
+	public void GenerateHallwayPaths()
 	{
 		ChangeGeneratorState(GeneratorState.GeneratingPaths);
 		float debugTime = 60f;

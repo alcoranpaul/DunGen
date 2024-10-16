@@ -9,8 +9,8 @@
 		"Name": "DebugObject"
 	},
 	{
-		"ID": "f24e2267402c9939193d1994b934126e",
-		"TypeName": "Game.GridDebugObject",
+		"ID": "fced32c6468302bd77c1169634ecd34f",
+		"TypeName": "GridSystem.GridDebugObject",
 		"ParentID": "b24373b14ad0677abb1eada569907ddc",
 		"V": {
 	"TextRender": "b891eb80456798a589cc01a55af24a83"
