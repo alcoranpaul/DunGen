@@ -9,15 +9,16 @@ namespace DunGen;
 /// </summary>
 public class Room
 {
-	public RoomPosition WorldPosition { get; private set; }
+	public RoomPosition RoomPosition { get; private set; }
 	public int Width { get; private set; }
 	public int Length { get; private set; }
 	public int Height { get; private set; }
 	public Actor ModelActor { get; private set; }
+	public List<GridSystem.GridPosition> NeighborNodes { get; private set; }
 
-	public Room(RoomPosition worldPosition, int width, int height, int length, Actor modelActor = null)
+	public Room(RoomPosition roomPosition, int width, int height, int length, Actor modelActor = null)
 	{
-		WorldPosition = worldPosition;
+		RoomPosition = roomPosition;
 		Width = width;
 		Length = length;
 		Height = height;
@@ -27,7 +28,12 @@ public class Room
 
 	public override string ToString()
 	{
-		return $"Room at {WorldPosition.X}, {WorldPosition.Z} with dimensions {Width}x{Length}x{Height}";
+		return $"({RoomPosition.X}, {RoomPosition.Z}) -- [{Width}x{Length}x{Height}]";
+	}
+
+	public void SetNeighborNodes(List<GridSystem.GridPosition> neighborNodes)
+	{
+		NeighborNodes = neighborNodes;
 	}
 
 }

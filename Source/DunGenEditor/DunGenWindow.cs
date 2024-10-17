@@ -101,7 +101,7 @@ public class DunGenWindow : CustomEditorWindow
 
 		layout.Space(10);
 		var spawnDebugButton = layout.Button("Spawn Debug Dungeon", Color.DarkRed);
-		spawnDebugButton.Button.Clicked += () => DataGenerator.Instance.SpawnDebugDungeon();
+		spawnDebugButton.Button.Clicked += () => DataGenerator.Instance.SpawnGridDebugDungeon();
 
 		layout.Space(10);
 		var destroyButton = layout.Button("Destroy Dungeon", Color.DarkRed);
@@ -183,7 +183,7 @@ public class DunGenWindow : CustomEditorWindow
 
 
 		dataGenerator.GenerateDungeonData();
-		modelGenerator.SpawnFloors();
+		modelGenerator.SpawnModels();
 
 		if (!EnableDebugDraw)
 			DebugDraw.UpdateContext(IntPtr.Zero, float.MaxValue);
@@ -192,12 +192,9 @@ public class DunGenWindow : CustomEditorWindow
 	private void DestroyDungeon()
 	{
 		DebugDraw.UpdateContext(IntPtr.Zero, float.MaxValue);
-		Actor DungeonGenActor = Level.FindActor("DungeonGenActor");
-		// If Actor has children, destroy them
-		if (DungeonGenActor != null && DungeonGenActor.ChildrenCount > 0)
-		{
-			DungeonGenActor.DestroyChildren();
-		}
+		dataGenerator?.DestroyData();
+		modelGenerator?.DestroyDungeon();
+		Editor.Instance.Windows.SceneWin.Focus();
 	}
 
 	private void ToggleDebugDraw(CheckBox box)

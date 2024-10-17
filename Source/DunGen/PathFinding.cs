@@ -26,6 +26,13 @@ public class PathFinding<T> where T : PathNode<T>
 
 	}
 
+	/// <summary>
+	/// Toggles the neighboring nodes based of off <paramref name="Width"/> and <paramref name="Length"/>
+	/// </summary>
+	/// <param name="basePosition"></param>
+	/// <param name="Width"></param>
+	/// <param name="Length"></param>
+	/// <param name="flag"></param>
 	public void ToggleNeighborWalkable(GridPosition basePosition, int Width, int Length, bool flag)
 	{
 		List<GridPosition> positions = GetNeighborhood(basePosition, Width, Length);
@@ -34,6 +41,13 @@ public class PathFinding<T> where T : PathNode<T>
 			ToggleNodeWalkable(pos, flag);
 	}
 
+	/// <summary>
+	/// Returns a list of <see cref="GridPosition"/> based of off <paramref name="Width"/> and <paramref name="Length"/>
+	/// </summary>
+	/// <param name="basePosition"></param>
+	/// <param name="Width"></param>
+	/// <param name="Length"></param>
+	/// <returns></returns>
 	public List<GridPosition> GetNeighborhood(GridPosition basePosition, int Width, int Length)
 	{
 		List<GridPosition> positions = new List<GridPosition>();

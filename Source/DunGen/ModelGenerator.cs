@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using FlaxEngine;
 
 namespace DunGen;
@@ -10,9 +11,11 @@ namespace DunGen;
 public class ModelGenerator
 {
 	public static ModelGenerator Instance { get; private set; }
-	private DataGenerator dataGenerator;
 	public DungeonGenSettings Settings { get; private set; }
+
 	private const string ACTOR_NAME = "DungeonGenActor";
+	private readonly DataGenerator dataGenerator;
+	private Actor dungeonGenActor;
 
 	public ModelGenerator(DataGenerator dataGenerator)
 	{
@@ -24,9 +27,17 @@ public class ModelGenerator
 
 		Settings = settings.CreateInstance<DungeonGenSettings>();
 		this.dataGenerator = dataGenerator;
+		SetupActor();
 
-		// Spawn floors
-		// Spawn rooms
+
+	}
+
+	public void SpawnModels()
+	{
+		DestroyDungeon();
+		SpawnFloors();
+		SpawnRooms();
+
 		// Spawn floor-walls
 		// Spawn doors
 		// Should defined by rules
@@ -36,14 +47,59 @@ public class ModelGenerator
 		// https://www.youtube.com/watch?v=PhLcNhK9aro&t=477s
 	}
 
-	public void SpawnFloors()
+	private void SetupActor()
 	{
-		Actor dungeonGenActor = Level.FindActor(ACTOR_NAME);
-		foreach (var nodePos in dataGenerator.Paths)
+		dungeonGenActor = Level.FindActor(ACTOR_NAME);
+		if (dungeonGenActor == null)
+		{
+			dungeonGenActor = new EmptyActor();
+			dungeonGenActor.Name = ACTOR_NAME;
+			Level.SpawnActor(dungeonGenActor);
+
+		}
+	}
+
+	private void SpawnFloors()
+	{
+
+		foreach (GridSystem.GridPosition nodePos in dataGenerator.Paths)
 		{
 			Actor floor = PrefabManager.SpawnPrefab(Settings.DebugSetting.FloorPrefab, dataGenerator.Pathfinding.GridSystem.GetWorldPosition(nodePos), Quaternion.Identity);
 			floor.Parent = dungeonGenActor;
 
 		}
+	}
+
+	private void SpawnRooms()
+	{
+		foreach (Room room in dataGenerator.Rooms)
+		{
+
+			Actor childModel = PrefabManager.SpawnPrefab(Settings.DebugSetting.RoomPrefab, room.RoomPosition.Position3D, Quaternion.
+			Identity);
+
+			childModel.Parent = dungeonGenActor;
+			childModel.Scale = new Vector3(room.Width, room.Height, room.Length);
+			StaticModel model = childModel as StaticModel;
+			model.SetMaterial(0, Settings.DebugSetting.Material);
+
+			Debug.Log($"Room: {room}... NeightborCount: {room.NeighborNodes.Count}");
+			foreach (var neighborGridPos in room.NeighborNodes)
+			{
+				BoundingSphere boundingSphere = new BoundingSphere(dataGenerator.Pathfinding.GridSystem.GetWorldPosition(neighborGridPos), 15f);
+				DebugDraw.DrawSphere(boundingSphere, Color.Red, 60f);
+			}
+		}
+
+	}
+
+	public void DestroyDungeon()
+	{
+		// If Actor has children, destroy them
+		if (dungeonGenActor != null && dungeonGenActor.ChildrenCount > 0)
+		{
+			dungeonGenActor.DestroyChildren();
+		}
+
 	}
 }

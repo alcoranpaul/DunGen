@@ -60,9 +60,15 @@ public class GridSystem<TGridObject>
 
 	public void CreateDebugObjects(Prefab prefab)
 	{
-		Actor debugActor = new EmptyActor();
-		debugActor.Name = "GridDebugObjects";
-		Level.SpawnActor(debugActor);
+		Actor debugActor = Level.FindActor("GridDebugObjects");
+		if (debugActor == null)
+		{
+
+			debugActor = new EmptyActor();
+			debugActor.Name = "GridDebugObjects";
+			Level.SpawnActor(debugActor);
+		}
+
 		for (int x = 0; x < Dimension.X; x++)
 		{
 			for (int z = 0; z < Dimension.Y; z++)

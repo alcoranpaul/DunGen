@@ -26,6 +26,8 @@ public class PathfindingDebugObject : GridDebugObject
 	protected override void SetText(string text)
 	{
 		base.SetText(text);
+		if (pathNode is null) return;
+
 		if (pathNode.IsWalkable)
 		{
 			gCost.Text = pathNode.GCost.ToString();
