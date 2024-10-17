@@ -183,7 +183,9 @@ public class Generator
 		bool canOccupySpace = true;
 		foreach (var neighbor in neightborhood)
 		{
-			PathFinding.PathNode node = Pathfinding.GetNode(neighbor);
+			PathNode<RoomNode> node = Pathfinding.GetNode<RoomNode>(neighbor);
+
+			// Debug.Log($"Checking neighbor at {neighbor} with node is not null: {node != null}");
 			// Debug.Log($"Checking neighbor at {neighbor} with node is not null: {node != null}");
 
 			if (node == null) continue;
@@ -222,33 +224,74 @@ public class Generator
 			GridSystem.GridPosition startingPos = Pathfinding.GridSystem.GetGridPosition(edge.A.VPoint);
 			GridSystem.GridPosition end = Pathfinding.GridSystem.GetGridPosition(edge.B.VPoint);
 
-			Pathfinding.GetNode(startingPos).NodeType = PathFinding.NodeType.Hallway;
-			Pathfinding.GetNode(end).NodeType = PathFinding.NodeType.Hallway;
+			Pathfinding.GetNode<RoomNode>(startingPos).NodeType = NodeType.Hallway;
+			Pathfinding.GetNode<RoomNode>(end).NodeType = NodeType.Hallway;
 		}
 
 		foreach (var edge in hallwayPaths)
 		{
 			GridSystem.GridPosition startingPos = Pathfinding.GridSystem.GetGridPosition(edge.A.VPoint);
 			GridSystem.GridPosition end = Pathfinding.GridSystem.GetGridPosition(edge.B.VPoint);
-			// DebugDraw.DrawSphere(new BoundingSphere(Pathfinding.GridSystem.GetWorldPosition(startingPos), 15f), Color.AliceBlue, 60f);
-			// DebugDraw.DrawSphere(new BoundingSphere(Pathfinding.GridSystem.GetWorldPosition(end), 15f), Color.Aqua, 60f);
+			// Debug.Log($"Path from {startingPos} to {end}");
 			List<GridSystem.GridPosition> paths = Pathfinding.FindPath(startingPos, end);
 			if (paths == null) continue;
-
-			for (int i = 0; i < paths.Count - 1; i++)
+			string pathString = $"Path from {paths[0]} to {paths[^1]}: ";
+			for (int i = 0; i < paths.Count; i++)  // Notice we're using paths.Count, not paths.Count - 1
 			{
-				Actor floor1 = PrefabManager.SpawnPrefab(Settings.DebugSetting.FloorPrefab, Pathfinding.GridSystem.GetWorldPosition(paths[i]), Quaternion.Identity);
-				Actor floot2 = PrefabManager.SpawnPrefab(Settings.DebugSetting.FloorPrefab, Pathfinding.GridSystem.GetWorldPosition(paths[i + 1]), Quaternion.Identity);
-				floor1.Parent = DungeonGenActor;
-				floot2.Parent = DungeonGenActor;
-				DebugDraw.DrawLine(
-					Pathfinding.GridSystem.GetWorldPosition(paths[i]),
-					Pathfinding.GridSystem.GetWorldPosition(paths[i + 1]),
-					Color.Red,
-					60f
-				);
+				GridSystem.GridPosition currentPos = paths[i];
+
+				// Append the current position to pathString
+				pathString += currentPos.ToString();
+
+				// Add a separator for readability (but don't add it after the last position)
+				if (i < paths.Count - 1)
+				{
+					pathString += " -> ";
+				}
+
+				// Spawn a single floor at each path point
+				Actor floor = PrefabManager.SpawnPrefab(Settings.DebugSetting.FloorPrefab, Pathfinding.GridSystem.GetWorldPosition(currentPos), Quaternion.Identity);
+				floor.Parent = DungeonGenActor;
+
+				// Draw the line if there is a next point in the path
+				if (i < paths.Count - 1)
+				{
+					DebugDraw.DrawLine(
+						Pathfinding.GridSystem.GetWorldPosition(paths[i]),
+						Pathfinding.GridSystem.GetWorldPosition(paths[i + 1]),
+						Color.Red,
+						60f
+					);
+				}
+			}
+			Debug.Log(pathString);
+		}
+	}
+
+	// Helper method to check if a path already exists in the uniquePaths list
+	private bool ContainsPath(List<List<GridSystem.GridPosition>> uniquePaths, List<GridSystem.GridPosition> newPath)
+	{
+		foreach (var existingPath in uniquePaths)
+		{
+			if (ArePathsEqual(existingPath, newPath))
+			{
+				return true;  // Path is already in the list
 			}
 		}
+		return false;  // Path is unique
+	}
+
+	// Helper method to compare two lists of GridPosition
+	private bool ArePathsEqual(List<GridSystem.GridPosition> path1, List<GridSystem.GridPosition> path2)
+	{
+		if (path1.Count != path2.Count) return false;
+
+		for (int i = 0; i < path1.Count; i++)
+		{
+			if (!path1[i].Equals(path2[i])) return false;
+		}
+
+		return true;  // Paths are the same
 	}
 
 	private List<DelaunayTriangulation.Edge> CalculatePaths(float debugTime, List<DelaunayTriangulation.Point> points, HashSet<DelaunayTriangulation.Edge> edges)
@@ -259,7 +302,6 @@ public class Generator
 		{
 			Prim.Edge e = new Prim.Edge(edge.A, edge.B);
 			weightedEdges.Add(e);
-			// DebugDraw.DrawText($"{e.Distance}", (edge.A.VPoint + edge.B.VPoint) / 2, Color.DarkRed, 8, debugTime, 0.5f);
 		}
 
 		List<DelaunayTriangulation.Edge> finalPaths = Prim.MinimumSpanningTree(weightedEdges, points[0]);
