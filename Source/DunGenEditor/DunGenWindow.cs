@@ -30,6 +30,7 @@ public class DunGenWindow : CustomEditorWindow
 	public const string MATERIAL_FOLDER_NAME = "Material";
 
 	public bool EnableDebugDraw = false;
+	public DebugDrawType _DebugDrawType;
 	private readonly string repoURL = "";
 
 	private DataGenerator dataGenerator;
@@ -40,6 +41,7 @@ public class DunGenWindow : CustomEditorWindow
 	{
 		// Debug.Log($"DunGenWindow Constructor");
 		repoURL = description.RepositoryUrl;
+
 	}
 	public override void Initialize(LayoutElementsContainer layout)
 	{
@@ -194,6 +196,15 @@ public class DunGenWindow : CustomEditorWindow
 		DebugDraw.UpdateContext(IntPtr.Zero, float.MaxValue);
 		dataGenerator?.DestroyData();
 		modelGenerator?.DestroyDungeon();
+		if (modelGenerator == null)
+		{
+			Actor dungeonGenActor = Level.FindActor("DungeonGenActor");
+			// If Actor has children, destroy them
+			if (dungeonGenActor != null && dungeonGenActor.ChildrenCount > 0)
+			{
+				dungeonGenActor.DestroyChildren();
+			}
+		}
 		Editor.Instance.Windows.SceneWin.Focus();
 	}
 
@@ -366,7 +377,13 @@ public class DunGenWindow : CustomEditorWindow
 		return debugSettings;
 	}
 
-
+	public enum DebugDrawType
+	{
+		Grid,
+		Pathfinding,
+		Rooms,
+		All
+	}
 
 }
 

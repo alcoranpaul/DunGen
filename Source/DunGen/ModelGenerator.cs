@@ -64,8 +64,12 @@ public class ModelGenerator
 
 		foreach (GridSystem.GridPosition nodePos in dataGenerator.Paths)
 		{
-			Actor floor = PrefabManager.SpawnPrefab(Settings.DebugSetting.FloorPrefab, dataGenerator.Pathfinding.GridSystem.GetWorldPosition(nodePos), Quaternion.Identity);
+			Vector3 pos = dataGenerator.Pathfinding.GridSystem.GetWorldPosition(nodePos);
+			Actor floor = PrefabManager.SpawnPrefab(Settings.DebugSetting.FloorPrefab, pos, Quaternion.Identity);
 			floor.Parent = dungeonGenActor;
+
+
+			DebugDraw.DrawText($"Floor Node", pos, Color.Blue, 8, 60f);
 
 		}
 	}
@@ -74,8 +78,8 @@ public class ModelGenerator
 	{
 		foreach (Room room in dataGenerator.Rooms)
 		{
-
-			Actor childModel = PrefabManager.SpawnPrefab(Settings.DebugSetting.RoomPrefab, room.RoomPosition.Position3D, Quaternion.
+			Vector3 pos = room.RoomPosition.Position3D;
+			Actor childModel = PrefabManager.SpawnPrefab(Settings.DebugSetting.RoomPrefab, pos, Quaternion.
 			Identity);
 
 			childModel.Parent = dungeonGenActor;
@@ -86,8 +90,10 @@ public class ModelGenerator
 			Debug.Log($"Room: {room}... NeightborCount: {room.NeighborNodes.Count}");
 			foreach (var neighborGridPos in room.NeighborNodes)
 			{
-				BoundingSphere boundingSphere = new BoundingSphere(dataGenerator.Pathfinding.GridSystem.GetWorldPosition(neighborGridPos), 15f);
-				DebugDraw.DrawSphere(boundingSphere, Color.Red, 60f);
+				// BoundingSphere boundingSphere = new BoundingSphere(dataGenerator.Pathfinding.GridSystem.GetWorldPosition(neighborGridPos), 15f);
+				// DebugDraw.DrawSphere(boundingSphere, Color.Red, 60f);
+
+				DebugDraw.DrawText($"Room Node", dataGenerator.Pathfinding.GridSystem.GetWorldPosition(neighborGridPos), Color.Red, 8, 60f);
 			}
 		}
 

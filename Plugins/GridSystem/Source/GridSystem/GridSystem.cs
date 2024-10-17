@@ -15,7 +15,7 @@ public class GridSystem<TGridObject>
 	public Vector3 Origin { get; private set; }  // Store the origin
 
 	private const float METERS_TO_CM = 100f; // Conversion factor from centimeters to meters
-	private readonly TGridObject[,] gridObjects;
+	public TGridObject[,] GridObjects { get; private set; }
 
 
 	public GridSystem(Vector2 dimension, float unitScale, Func<GridSystem<TGridObject>, GridPosition, TGridObject> createGridObject)
@@ -26,14 +26,14 @@ public class GridSystem<TGridObject>
 		// Convert Origin from centimeters to meters
 		Origin = Vector3.Zero * METERS_TO_CM;
 
-		gridObjects = new TGridObject[(int)Dimension.X, (int)Dimension.Y];
+		GridObjects = new TGridObject[(int)Dimension.X, (int)Dimension.Y];
 
 		for (int x = 0; x < Dimension.X; x++)
 		{
 			for (int z = 0; z < Dimension.Y; z++)
 			{
 				GridPosition pos = new GridPosition(x, z);
-				gridObjects[x, z] = createGridObject(this, pos);
+				GridObjects[x, z] = createGridObject(this, pos);
 			}
 		}
 	}
@@ -112,8 +112,8 @@ public class GridSystem<TGridObject>
 	private BoundingBox GetBoundingBox(out Vector3 minWorldPos, out Vector3 maxWorldPos, bool isDebug = false, float yOffset = 0)
 	{
 		// Define grid boundaries in grid coordinates
-		GridPosition min = (gridObjects[0, 0] as IGridObject).GridPosition;
-		GridPosition max = (gridObjects[(int)Dimension.X - 1, (int)Dimension.X - 1] as IGridObject).GridPosition;
+		GridPosition min = (GridObjects[0, 0] as IGridObject).GridPosition;
+		GridPosition max = (GridObjects[(int)Dimension.X - 1, (int)Dimension.X - 1] as IGridObject).GridPosition;
 
 		// Get the world positions with the center offset
 		minWorldPos = GetWorldPosition(min);
@@ -155,7 +155,7 @@ public class GridSystem<TGridObject>
 
 	public TGridObject GetGridObject(GridPosition position)
 	{
-		return gridObjects[position.X, position.Z];
+		return GridObjects[position.X, position.Z];
 	}
 
 	private Vector3 GetOffset()
