@@ -32,7 +32,7 @@ public class DunGenWindow : CustomEditorWindow
 	public bool EnableDebugDraw = false;
 	private readonly string repoURL = "";
 
-	private Generator generator;
+	private DataGenerator generator;
 	private Action action;
 
 	public DunGenWindow(PluginDescription description)
@@ -100,7 +100,7 @@ public class DunGenWindow : CustomEditorWindow
 
 		layout.Space(10);
 		var spawnDebugButton = layout.Button("Spawn Debug Dungeon", Color.DarkRed);
-		spawnDebugButton.Button.Clicked += () => Generator.Instance.SpawnDebugDungeon();
+		spawnDebugButton.Button.Clicked += () => DataGenerator.Instance.SpawnDebugDungeon();
 
 		layout.Space(10);
 		var destroyButton = layout.Button("Destroy Dungeon", Color.DarkRed);
@@ -122,7 +122,7 @@ public class DunGenWindow : CustomEditorWindow
 	private void GeneratePathfinding(ButtonElement button)
 	{
 		DestroyDungeon();
-		generator = new Generator();
+		generator = new DataGenerator();
 		generator.SetupActor();
 		generator.GeneratePathfinding();
 		Debug.Log($"Generate Pathfinding");
@@ -135,7 +135,7 @@ public class DunGenWindow : CustomEditorWindow
 	private void SpawnRooms(ButtonElement button)
 	{
 
-		if (Generator.Instance == null)
+		if (DataGenerator.Instance == null)
 		{
 			Debug.LogWarning("Generator Instance is null");
 			return;
@@ -150,7 +150,7 @@ public class DunGenWindow : CustomEditorWindow
 	private void ConnectRooms(ButtonElement button)
 	{
 
-		if (Generator.Instance == null)
+		if (DataGenerator.Instance == null)
 		{
 			Debug.LogWarning("Generator Instance is null");
 			return;
@@ -170,7 +170,7 @@ public class DunGenWindow : CustomEditorWindow
 	private void GenerateFinalDungeon()
 	{
 		DebugDraw.UpdateContext(IntPtr.Zero, float.MaxValue);
-		generator = new Generator();
+		generator = new DataGenerator();
 		generator.GenerateFinalDungeon();
 
 		if (!EnableDebugDraw)

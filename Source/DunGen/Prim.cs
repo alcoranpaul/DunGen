@@ -187,7 +187,7 @@ public class Prim
 	/// <param name="weightedEdges">List of edges with weights.</param>
 	/// <param name="start">The starting point for Prim's algorithm.</param>
 	/// <returns>A list of edges that make up the Minimum Spanning Tree.</returns>
-	public static List<DelaunayTriangulation.Edge> MinimumSpanningTree(List<Prim.Edge> weightedEdges, DelaunayTriangulation.Point start)
+	public static HashSet<DelaunayTriangulation.Edge> MinimumSpanningTree(List<Prim.Edge> weightedEdges, DelaunayTriangulation.Point start)
 	{
 		HashSet<DelaunayTriangulation.Edge> mst = new HashSet<DelaunayTriangulation.Edge>();
 
@@ -236,7 +236,7 @@ public class Prim
 			}
 		}
 
-		return mst.ToList(); // Convert HashSet to List, O(M)
+		return mst; // Convert HashSet to List, O(M)
 	}
 
 	/// <summary>

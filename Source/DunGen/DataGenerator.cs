@@ -1,32 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FlaxEngine;
 using FlaxEngine.Utilities;
 
 namespace DunGen;
 
 /// <summary>
-/// Generator Script.
+/// The DataGenerator class is responsible for generating and calculating the data for the dungeon
 /// </summary>
-public class Generator
+public class DataGenerator
 {
-	public static Generator Instance { get; private set; }
-	public PathFinding Pathfinding { get; private set; }
+	public static DataGenerator Instance { get; private set; }
+	public PathFinding<RoomNode> Pathfinding { get; private set; }
 	public DungeonGenSettings Settings { get; private set; }
 	public List<Room> Rooms;
-	private Actor DungeonGenActor;
-	private const string ACTOR_NAME = "DungeonGenActor";
+
 	public DungeonGenState State { get; private set; }
 	public GeneratorState GeneratorState { get; private set; }
 
-	public Generator()
+	private Actor DungeonGenActor;
+	private const string ACTOR_NAME = "DungeonGenActor";
+
+	public DataGenerator()
 	{
 		// Debug.Log("Generator Constructor");
 		if (Instance == null)
 			Instance = this;
 
 		var settings = Engine.GetCustomSettings("DunGenSettings");
-		if (!settings) Debug.LogError("DunGen does not exists");
+		if (!settings) Debug.LogError("DunGenSettings does not exists in Engine Custom Settings");
 
 		Settings = settings.CreateInstance<DungeonGenSettings>();
 		State = DungeonGenState.None;
@@ -80,10 +83,10 @@ public class Generator
 
 	public void GeneratePathfinding()
 	{
-		// Setup Grid plus Pathfinding
-		Pathfinding = new PathFinding(new Vector2(Settings.Size, Settings.Size));
+
+		// Setup Pathfinding
+		Pathfinding = new PathFinding<RoomNode>(new Vector2(Settings.Size, Settings.Size), (GridSystem.GridSystem<RoomNode> GridSystem, GridSystem.GridPosition gridPosition) => { return new RoomNode(GridSystem, gridPosition); });
 		Settings.BoundingBox = Pathfinding.GetBoundingBox();
-		// Debug.Log($"GeneratePathfinding Pathfinding null: {Pathfinding == null}");
 	}
 
 	public void DestroyDungeon()
@@ -96,6 +99,7 @@ public class Generator
 			{
 
 				GridSystem.GridPosition gridPos = Pathfinding.GridSystem.GetGridPosition(Rooms[i].WorldPosition.Position3D);
+				// Reset node to walkable
 				Pathfinding.ToggleNeighborWalkable(gridPos, Rooms[i].Width, Rooms[i].Length, true);
 				Rooms[i] = null;  // Set the room reference to null
 			}
@@ -145,7 +149,7 @@ public class Generator
 		model.SetMaterial(0, Settings.DebugSetting.Material);
 
 		GridSystem.GridPosition gridPos = Pathfinding.GridSystem.GetGridPosition(position);
-		Pathfinding.ToggleNeighborWalkable(gridPos, Width, Length, false);
+		Pathfinding.ToggleNeighborWalkable(gridPos, Width, Length, false); // Set nodes to unwalkable
 
 		Vector3 worldPos = Pathfinding.GridSystem.GetWorldPosition(gridPos);
 		RoomPosition roomPosition = new RoomPosition(worldPos);
@@ -183,7 +187,7 @@ public class Generator
 		bool canOccupySpace = true;
 		foreach (var neighbor in neightborhood)
 		{
-			PathNode<RoomNode> node = Pathfinding.GetNode<RoomNode>(neighbor);
+			RoomNode node = Pathfinding.GetNode(neighbor);
 
 			// Debug.Log($"Checking neighbor at {neighbor} with node is not null: {node != null}");
 			// Debug.Log($"Checking neighbor at {neighbor} with node is not null: {node != null}");
@@ -215,8 +219,7 @@ public class Generator
 		float debugTime = 60f;
 		List<DelaunayTriangulation.Point> points = new List<DelaunayTriangulation.Point>();
 		HashSet<DelaunayTriangulation.Edge> edges = CreateDelaunayTriangulation(points);
-
-		List<DelaunayTriangulation.Edge> hallwayPaths = CalculatePaths(debugTime, points, edges);
+		HashSet<DelaunayTriangulation.Edge> hallwayPaths = CalculatePaths(debugTime, points, edges);
 
 		// Set Node type to hallway nodes
 		foreach (var edge in hallwayPaths)
@@ -224,8 +227,8 @@ public class Generator
 			GridSystem.GridPosition startingPos = Pathfinding.GridSystem.GetGridPosition(edge.A.VPoint);
 			GridSystem.GridPosition end = Pathfinding.GridSystem.GetGridPosition(edge.B.VPoint);
 
-			Pathfinding.GetNode<RoomNode>(startingPos).NodeType = NodeType.Hallway;
-			Pathfinding.GetNode<RoomNode>(end).NodeType = NodeType.Hallway;
+			Pathfinding.GetNode(startingPos).SetToHallway();
+			Pathfinding.GetNode(end).SetToHallway(); ;
 		}
 
 		foreach (var edge in hallwayPaths)
@@ -233,8 +236,10 @@ public class Generator
 			GridSystem.GridPosition startingPos = Pathfinding.GridSystem.GetGridPosition(edge.A.VPoint);
 			GridSystem.GridPosition end = Pathfinding.GridSystem.GetGridPosition(edge.B.VPoint);
 			// Debug.Log($"Path from {startingPos} to {end}");
-			List<GridSystem.GridPosition> paths = Pathfinding.FindPath(startingPos, end);
+			List<GridSystem.GridPosition> paths = Pathfinding.FindPath(startingPos, end, new PathFinding<RoomNode>.TentativeGCostDelegate(RoomNode.CalculateTentativeGCost));
+
 			if (paths == null) continue;
+
 			string pathString = $"Path from {paths[0]} to {paths[^1]}: ";
 			for (int i = 0; i < paths.Count; i++)  // Notice we're using paths.Count, not paths.Count - 1
 			{
@@ -268,33 +273,7 @@ public class Generator
 		}
 	}
 
-	// Helper method to check if a path already exists in the uniquePaths list
-	private bool ContainsPath(List<List<GridSystem.GridPosition>> uniquePaths, List<GridSystem.GridPosition> newPath)
-	{
-		foreach (var existingPath in uniquePaths)
-		{
-			if (ArePathsEqual(existingPath, newPath))
-			{
-				return true;  // Path is already in the list
-			}
-		}
-		return false;  // Path is unique
-	}
-
-	// Helper method to compare two lists of GridPosition
-	private bool ArePathsEqual(List<GridSystem.GridPosition> path1, List<GridSystem.GridPosition> path2)
-	{
-		if (path1.Count != path2.Count) return false;
-
-		for (int i = 0; i < path1.Count; i++)
-		{
-			if (!path1[i].Equals(path2[i])) return false;
-		}
-
-		return true;  // Paths are the same
-	}
-
-	private List<DelaunayTriangulation.Edge> CalculatePaths(float debugTime, List<DelaunayTriangulation.Point> points, HashSet<DelaunayTriangulation.Edge> edges)
+	private HashSet<DelaunayTriangulation.Edge> CalculatePaths(float debugTime, List<DelaunayTriangulation.Point> points, HashSet<DelaunayTriangulation.Edge> edges)
 	{
 		// Debug.Log("Calculating MST ...");
 		List<Prim.Edge> weightedEdges = new List<Prim.Edge>();
@@ -304,7 +283,7 @@ public class Generator
 			weightedEdges.Add(e);
 		}
 
-		List<DelaunayTriangulation.Edge> finalPaths = Prim.MinimumSpanningTree(weightedEdges, points[0]);
+		HashSet<DelaunayTriangulation.Edge> finalPaths = Prim.MinimumSpanningTree(weightedEdges, points[0]);
 
 		// Debug.Log($"Adding more paths into MST ..." + finalPaths.Count);
 		// Add more edges to the MST
@@ -316,8 +295,9 @@ public class Generator
 			if (rand < 0.451f)
 				finalPaths.Add(edge);
 		}
+		List<DelaunayTriangulation.Edge> listPaths = finalPaths.ToList();
 
-		DelaunayTriangulation.Edge.DebugEdges(finalPaths, Color.DarkBlue, 40f);
+		DelaunayTriangulation.Edge.DebugEdges(listPaths, Color.DarkBlue, 40f);
 
 		return finalPaths;
 	}

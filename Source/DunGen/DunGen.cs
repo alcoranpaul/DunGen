@@ -12,7 +12,7 @@ namespace DunGen
 	/// <seealso cref="GamePlugin" />
 	public class DunGen : GamePlugin
 	{
-		public Generator Generator { get; private set; }
+		// public DataGenerator Generator { get; private set; }
 		/// <inheritdoc />
 		public DunGen()
 		{
@@ -36,10 +36,10 @@ namespace DunGen
 		public override void Initialize()
 		{
 			base.Initialize();
-			Debug.Log("DunGen Initialize");
-			if (Generator.Instance == null)
-				Generator = new Generator();
-			else Generator = Generator.Instance;
+			// Debug.Log("DunGen Initialize");
+			// if (DataGenerator.Instance == null)
+			// 	Generator = new DataGenerator();
+			// else Generator = DataGenerator.Instance;
 
 		}
 
@@ -52,8 +52,8 @@ namespace DunGen
 
 		public void GenerateDungeon()
 		{
-			if (Generator != null)
-				Generator.GenerateFinalDungeon();
+			// if (Generator != null)
+			// 	Generator.GenerateFinalDungeon();
 		}
 	}
 
