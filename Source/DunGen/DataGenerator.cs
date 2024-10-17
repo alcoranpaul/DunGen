@@ -15,6 +15,7 @@ public class DataGenerator
 	public PathFinding<RoomNode> Pathfinding { get; private set; }
 	public DungeonGenSettings Settings { get; private set; }
 	public List<Room> Rooms;
+	public HashSet<GridSystem.GridPosition> Paths { get; private set; }
 
 	public DungeonGenState State { get; private set; }
 	public GeneratorState GeneratorState { get; private set; }
@@ -36,19 +37,13 @@ public class DataGenerator
 		GeneratorState = GeneratorState.None;
 
 		Rooms = new List<Room>();
+		Paths = new HashSet<GridSystem.GridPosition>();
 	}
 
-	public void GenerateFinalDungeon()
+	public void GenerateDungeonData()
 	{
 		// Spawn an empty actor to hold the dungeon
-		DungeonGenActor = Level.FindActor(ACTOR_NAME);
-		if (DungeonGenActor == null)
-		{
-			DungeonGenActor = new EmptyActor();
-			DungeonGenActor.Name = ACTOR_NAME;
-			Level.SpawnActor(DungeonGenActor);
-
-		}
+		SetupActor();
 
 		// Debug.Log("Generating dungeon...");
 		ChangeState(DungeonGenState.Generating);
@@ -65,11 +60,12 @@ public class DataGenerator
 		// Debug.Log("Dungeon generation complete");
 
 	}
+
 	public void SpawnDebugDungeon()
 	{
 		Pathfinding.SpawnDebugObjects(Settings.DebugSetting.PathfindingDebugPrefab);
 	}
-	public void SetupActor()
+	private void SetupActor()
 	{
 		DungeonGenActor = Level.FindActor(ACTOR_NAME);
 		if (DungeonGenActor == null)
@@ -81,7 +77,7 @@ public class DataGenerator
 		}
 	}
 
-	public void GeneratePathfinding()
+	private void GeneratePathfinding()
 	{
 
 		// Setup Pathfinding
@@ -116,7 +112,7 @@ public class DataGenerator
 
 	}
 
-	public void GenerateRoomData()
+	private void GenerateRoomData()
 	{
 		// Debug.Log($"Pathfinding null: {Pathfinding == null}");
 		ChangeGeneratorState(GeneratorState.SpawningRooms);
@@ -213,63 +209,65 @@ public class DataGenerator
 
 	}
 
-	public void GenerateHallwayPaths()
+	private void GenerateHallwayPaths()
 	{
 		ChangeGeneratorState(GeneratorState.GeneratingPaths);
 		float debugTime = 60f;
 		List<DelaunayTriangulation.Point> points = new List<DelaunayTriangulation.Point>();
 		HashSet<DelaunayTriangulation.Edge> edges = CreateDelaunayTriangulation(points);
-		HashSet<DelaunayTriangulation.Edge> hallwayPaths = CalculatePaths(debugTime, points, edges);
+		HashSet<DelaunayTriangulation.Edge> HallwayPaths = CalculatePaths(debugTime, points, edges);
 
-		// Set Node type to hallway nodes
-		foreach (var edge in hallwayPaths)
+
+
+
+		foreach (var edge in HallwayPaths)
 		{
 			GridSystem.GridPosition startingPos = Pathfinding.GridSystem.GetGridPosition(edge.A.VPoint);
 			GridSystem.GridPosition end = Pathfinding.GridSystem.GetGridPosition(edge.B.VPoint);
 
+			// Set Node type to hallway nodes
 			Pathfinding.GetNode(startingPos).SetToHallway();
-			Pathfinding.GetNode(end).SetToHallway(); ;
-		}
+			Pathfinding.GetNode(end).SetToHallway();
 
-		foreach (var edge in hallwayPaths)
-		{
-			GridSystem.GridPosition startingPos = Pathfinding.GridSystem.GetGridPosition(edge.A.VPoint);
-			GridSystem.GridPosition end = Pathfinding.GridSystem.GetGridPosition(edge.B.VPoint);
 			// Debug.Log($"Path from {startingPos} to {end}");
-			List<GridSystem.GridPosition> paths = Pathfinding.FindPath(startingPos, end, new PathFinding<RoomNode>.TentativeGCostDelegate(RoomNode.CalculateTentativeGCost));
+			List<GridSystem.GridPosition> paths = Pathfinding.FindPath(
+				startingPos,
+				end,
+				new PathFinding<RoomNode>.TentativeGCostDelegate(RoomNode.CalculateTentativeGCost));
 
 			if (paths == null) continue;
 
-			string pathString = $"Path from {paths[0]} to {paths[^1]}: ";
+			// string pathString = $"Path from {paths[0]} to {paths[^1]}: ";
 			for (int i = 0; i < paths.Count; i++)  // Notice we're using paths.Count, not paths.Count - 1
 			{
 				GridSystem.GridPosition currentPos = paths[i];
+				Paths.Add(currentPos);
 
-				// Append the current position to pathString
-				pathString += currentPos.ToString();
+				// // Append the current position to pathString
+				// pathString += currentPos.ToString();
 
-				// Add a separator for readability (but don't add it after the last position)
-				if (i < paths.Count - 1)
-				{
-					pathString += " -> ";
-				}
+				// // Add a separator for readability (but don't add it after the last position)
+				// if (i < paths.Count - 1)
+				// {
+				// 	pathString += " -> ";
+				// }
 
-				// Spawn a single floor at each path point
-				Actor floor = PrefabManager.SpawnPrefab(Settings.DebugSetting.FloorPrefab, Pathfinding.GridSystem.GetWorldPosition(currentPos), Quaternion.Identity);
-				floor.Parent = DungeonGenActor;
+				// // Spawn a single floor at each path point
+				// Actor floor = PrefabManager.SpawnPrefab(Settings.DebugSetting.FloorPrefab, Pathfinding.GridSystem.GetWorldPosition(currentPos), Quaternion.Identity);
+				// floor.Parent = DungeonGenActor;
 
-				// Draw the line if there is a next point in the path
-				if (i < paths.Count - 1)
-				{
-					DebugDraw.DrawLine(
-						Pathfinding.GridSystem.GetWorldPosition(paths[i]),
-						Pathfinding.GridSystem.GetWorldPosition(paths[i + 1]),
-						Color.Red,
-						60f
-					);
-				}
+				// // Draw the line if there is a next point in the path
+				// if (i < paths.Count - 1)
+				// {
+				// 	DebugDraw.DrawLine(
+				// 		Pathfinding.GridSystem.GetWorldPosition(paths[i]),
+				// 		Pathfinding.GridSystem.GetWorldPosition(paths[i + 1]),
+				// 		Color.Red,
+				// 		60f
+				// 	);
+				// }
 			}
-			Debug.Log(pathString);
+			// Debug.Log(pathString);
 		}
 	}
 

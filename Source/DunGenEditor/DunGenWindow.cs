@@ -32,8 +32,9 @@ public class DunGenWindow : CustomEditorWindow
 	public bool EnableDebugDraw = false;
 	private readonly string repoURL = "";
 
-	private DataGenerator generator;
-	private Action action;
+	private DataGenerator dataGenerator;
+	private ModelGenerator modelGenerator;
+
 
 	public DunGenWindow(PluginDescription description)
 	{
@@ -121,48 +122,48 @@ public class DunGenWindow : CustomEditorWindow
 
 	private void GeneratePathfinding(ButtonElement button)
 	{
-		DestroyDungeon();
-		generator = new DataGenerator();
-		generator.SetupActor();
-		generator.GeneratePathfinding();
-		Debug.Log($"Generate Pathfinding");
-		button.Button.Text = "Spawn Rooms";
-		action();
-		button.Button.Clicked += () => SpawnRooms(button);
-		action = () => button.Button.Clicked -= () => SpawnRooms(button);
+		// DestroyDungeon();
+		// generator = new DataGenerator();
+		// generator.SetupActor();
+		// generator.GeneratePathfinding();
+		// Debug.Log($"Generate Pathfinding");
+		// button.Button.Text = "Spawn Rooms";
+		// action();
+		// button.Button.Clicked += () => SpawnRooms(button);
+		// action = () => button.Button.Clicked -= () => SpawnRooms(button);
 	}
 
 	private void SpawnRooms(ButtonElement button)
 	{
 
-		if (DataGenerator.Instance == null)
-		{
-			Debug.LogWarning("Generator Instance is null");
-			return;
-		}
-		Debug.Log($"Spawn Rooms");
-		generator.GenerateRoomData();
-		button.Button.Text = "Connect Rooms";
-		action();
-		action = () => button.Button.Clicked -= () => ConnectRooms(button);
-		button.Button.Clicked += () => ConnectRooms(button);
+		// if (DataGenerator.Instance == null)
+		// {
+		// 	Debug.LogWarning("Generator Instance is null");
+		// 	return;
+		// }
+		// Debug.Log($"Spawn Rooms");
+		// generator.GenerateRoomData();
+		// button.Button.Text = "Connect Rooms";
+		// action();
+		// action = () => button.Button.Clicked -= () => ConnectRooms(button);
+		// button.Button.Clicked += () => ConnectRooms(button);
 	}
 	private void ConnectRooms(ButtonElement button)
 	{
 
-		if (DataGenerator.Instance == null)
-		{
-			Debug.LogWarning("Generator Instance is null");
-			return;
-		}
-		Debug.Log($"Connect Rooms");
-		generator.GenerateHallwayPaths();
-		Debug.Log($"GeneratePathfinding Pathfinding null: {generator.Pathfinding == null}");
-		button.Button.Text = "Generate Rooms";
-		action();
-		action = () => button.Button.Clicked -= () => SpawnRooms(button);
+		// if (DataGenerator.Instance == null)
+		// {
+		// 	Debug.LogWarning("Generator Instance is null");
+		// 	return;
+		// }
+		// Debug.Log($"Connect Rooms");
+		// generator.GenerateHallwayPaths();
+		// Debug.Log($"GeneratePathfinding Pathfinding null: {generator.Pathfinding == null}");
+		// button.Button.Text = "Generate Rooms";
+		// action();
+		// action = () => button.Button.Clicked -= () => SpawnRooms(button);
 
-		button.Button.Clicked += () => SpawnRooms(button);
+		// button.Button.Clicked += () => SpawnRooms(button);
 
 	}
 
@@ -170,8 +171,19 @@ public class DunGenWindow : CustomEditorWindow
 	private void GenerateFinalDungeon()
 	{
 		DebugDraw.UpdateContext(IntPtr.Zero, float.MaxValue);
-		generator = new DataGenerator();
-		generator.GenerateFinalDungeon();
+		if (DataGenerator.Instance == null)
+			dataGenerator = new DataGenerator();
+		else
+			dataGenerator = DataGenerator.Instance;
+
+		if (ModelGenerator.Instance == null)
+			modelGenerator = new ModelGenerator(dataGenerator);
+		else
+			modelGenerator = ModelGenerator.Instance;
+
+
+		dataGenerator.GenerateDungeonData();
+		modelGenerator.SpawnFloors();
 
 		if (!EnableDebugDraw)
 			DebugDraw.UpdateContext(IntPtr.Zero, float.MaxValue);

@@ -9,8 +9,22 @@ namespace DunGen;
 /// </summary>
 public class ModelGenerator
 {
-	public ModelGenerator()
+	public static ModelGenerator Instance { get; private set; }
+	private DataGenerator dataGenerator;
+	public DungeonGenSettings Settings { get; private set; }
+	private const string ACTOR_NAME = "DungeonGenActor";
+
+	public ModelGenerator(DataGenerator dataGenerator)
 	{
+		if (Instance == null)
+			Instance = this;
+
+		var settings = Engine.GetCustomSettings("DunGenSettings");
+		if (!settings) Debug.LogError("DunGenSettings does not exists in Engine Custom Settings");
+
+		Settings = settings.CreateInstance<DungeonGenSettings>();
+		this.dataGenerator = dataGenerator;
+
 		// Spawn floors
 		// Spawn rooms
 		// Spawn floor-walls
@@ -20,5 +34,16 @@ public class ModelGenerator
 		// https://www.youtube.com/watch?v=YJkfqEtJyzM&list=PL6MURe5By90mRPke0_vkxaqu0lRfeI8zl&index=5&t=295s
 		// https://www.youtube.com/watch?v=FvXfukJwqOQ&list=PLcRSafycjWFfEPbSSjGMNY-goOZTuBPMW&index=5
 		// https://www.youtube.com/watch?v=PhLcNhK9aro&t=477s
+	}
+
+	public void SpawnFloors()
+	{
+		Actor dungeonGenActor = Level.FindActor(ACTOR_NAME);
+		foreach (var nodePos in dataGenerator.Paths)
+		{
+			Actor floor = PrefabManager.SpawnPrefab(Settings.DebugSetting.FloorPrefab, dataGenerator.Pathfinding.GridSystem.GetWorldPosition(nodePos), Quaternion.Identity);
+			floor.Parent = dungeonGenActor;
+
+		}
 	}
 }
