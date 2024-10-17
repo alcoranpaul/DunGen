@@ -1,24 +1,9 @@
 ﻿
 using System;
-using System.Diagnostics;
-using FlaxEngine;
 using GridSystem;
 
 namespace DunGen;
 
-/// <summary>Value-type enumerator for traversing a <see cref="Coord3D"/> row-first
-/// <code>
-/// // Equivalent to the following nested loops
-/// for(Coord3D c = offset; c.d2 &lt; offset.d2 + size.d2; c.d2++) {
-///     for(c.d1 = offset.d1; c.d1 &lt; offset.d1 + size.d1; c.d1++) {
-///         for(c.d0 = offset.d0; c.d0 &lt; offset.d0 + size.d0; c.d0++) {
-///             yield return c;
-///         }
-///     }
-/// }
-/// </code>
-/// </summary>
-public struct Coord3DRowMajorCubeIterator { /* bla bla bla */ }
 public interface IPathNode : IGridObject
 {
 	public int GCost { get; }

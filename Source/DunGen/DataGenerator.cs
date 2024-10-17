@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FlaxEngine;
 using FlaxEngine.Utilities;
+using GridSystem;
 
 namespace DunGen;
 
@@ -13,15 +14,15 @@ namespace DunGen;
 public class DataGenerator // WhatIf: use dependency injection rather than Singleton
 {
 	public static DataGenerator Instance { get; private set; }
-	public PathFinding<RoomNode> Pathfinding { get; private set; }
+	private PathFinding<RoomNode> pathfinding;
 	public DungeonGenSettings Settings { get; private set; }
 	public List<Room> Rooms { get; private set; }
-	public HashSet<GridSystem.GridPosition> Paths { get; private set; }
-
+	public HashSet<GridPosition> Paths { get; private set; }
 	public DungeonGenState State { get; private set; }
 	public GeneratorState GeneratorState { get; private set; }
-
-
+	public RoomNode[,] NodeObjects { get { return pathfinding.GridObjects; } }
+	public Vector3 ToVector3(GridPosition pos) => pathfinding.GetWorldPosition(pos);
+	public Vector3 ToVector3(RoomNode node) => pathfinding.GetWorldPosition(node.GridPosition);
 
 	public DataGenerator()
 	{
@@ -36,7 +37,7 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 		GeneratorState = GeneratorState.None;
 
 		Rooms = new List<Room>();
-		Paths = new HashSet<GridSystem.GridPosition>();
+		Paths = new HashSet<GridPosition>();
 	}
 
 	/// <summary>
@@ -65,8 +66,8 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 	/// </summary>
 	public void SpawnGridDebugDungeon()
 	{
-		if (Pathfinding == null) return;
-		Pathfinding.SpawnDebugObjects(Settings.DebugSetting.DebugGridPrefab);
+		if (pathfinding == null) return;
+		pathfinding.SpawnDebugObjects(Settings.DebugSetting.DebugGridPrefab);
 	}
 
 	/// <summary>
@@ -74,8 +75,8 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 	/// </summary>
 	public void SpawnPathGridDebugDungeon()
 	{
-		if (Pathfinding == null) return;
-		Pathfinding.SpawnDebugObjects(Settings.DebugSetting.PathfindingDebugPrefab);
+		if (pathfinding == null) return;
+		pathfinding.SpawnDebugObjects(Settings.DebugSetting.PathfindingDebugPrefab);
 	}
 
 	/// <summary>
@@ -83,9 +84,9 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 	/// </summary>
 	private void GeneratePathfinding()
 	{
-		Pathfinding = new PathFinding<RoomNode>(new Vector2(Settings.Size, Settings.Size), (GridSystem.GridSystem<RoomNode> GridSystem, GridSystem.GridPosition gridPosition) => { return new RoomNode(GridSystem, gridPosition); });
+		pathfinding = new PathFinding<RoomNode>(new Vector2(Settings.Size, Settings.Size), (GridSystem<RoomNode> GridSystem, GridPosition gridPosition) => { return new RoomNode(GridSystem, gridPosition); });
 
-		Settings.BoundingBox = Pathfinding.GetBoundingBox();// WhatIf: remove bounding from from settings and just call the method
+		Settings.BoundingBox = pathfinding.GetBoundingBox();// WhatIf: remove bounding from from settings and just call the method
 	}
 
 	/// <summary>
@@ -98,10 +99,10 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 			// Iterate through each room and set it to null
 			for (int i = 0; i < Rooms.Count; i++)
 			{
-				GridSystem.GridPosition gridPos = Pathfinding.GridSystem.GetGridPosition(Rooms[i].RoomPosition.Position3D);
+				GridPosition gridPos = pathfinding.GetGridPosition(Rooms[i].RoomPosition.Position3D);
 
 				// Toggle neighborhood from Room.NeighborNodes	 
-				Pathfinding.ToggleNeighborWalkable(gridPos, Rooms[i].Width, Rooms[i].Length, true);
+				pathfinding.ToggleNeighborWalkable(gridPos, Rooms[i].Width, Rooms[i].Length, true);
 			}
 			Rooms?.Clear();
 		}
@@ -140,15 +141,31 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 
 		if (!isPositionValid) Debug.LogError("No valid position found for room"); // Generate another room? until room count has reached max
 
-		GridSystem.GridPosition gridPos = Pathfinding.GridSystem.GetGridPosition(position);
-		Pathfinding.ToggleNeighborWalkable(gridPos, Width, Length, false); // Set nodes to unwalkable
+		GridPosition gridPos = pathfinding.GetGridPosition(position);
+		pathfinding.ToggleNeighborWalkable(gridPos, Width, Length, false); // Set nodes to unwalkable
 
-		Vector3 worldPos = Pathfinding.GridSystem.GetWorldPosition(gridPos);
+		Vector3 worldPos = pathfinding.GetWorldPosition(gridPos);
+
+		// Create a Room
 		RoomPosition roomPosition = new RoomPosition(worldPos);
 		newRoom = new Room(roomPosition, Width, Height, Length);
-		newRoom.SetNeighborNodes(Pathfinding.GetNeighborhood(gridPos, Width, Length));
+		newRoom.SetNeighborNodes(pathfinding.GetNeighborhood(gridPos, Width, Length));
+
+		// SetNode to RoomNode
+		var baseNode = pathfinding.GetNode(gridPos);
+		baseNode.SetToRoom();
+
+		var neighborNodes = newRoom.NeighborNodes;
+		foreach (GridPosition item in neighborNodes)
+		{
+			var node = pathfinding.GetNode(item);
+			if (node == null) continue;
+			node.SetToRoom();
+
+		}
 		return;
 	}
+
 
 	/// <summary>
 	/// Finds a valid room position by generating a random position and checking if the room can occupy the space
@@ -191,14 +208,15 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 			rnd.Next((int)Settings.BoundingBox.Minimum.Z, (int)Settings.BoundingBox.Maximum.Z)
 		);
 
+		GridPosition gridPos = pathfinding.GetGridPosition(position);
 		// Check neighbors including base position
-		List<GridSystem.GridPosition> neightborhood = Pathfinding.GetNeighborhood(Pathfinding.GridSystem.GetGridPosition(position), Width, Length);
+		List<GridPosition> neightborhood = pathfinding.GetNeighborhood(gridPos, Width, Length);
 
 
 		bool canOccupySpace = true;
 		foreach (var neighbor in neightborhood) // Cheacks the neighborhood for walkable nodes based off of Width and Length
 		{
-			RoomNode node = Pathfinding.GetNode(neighbor);
+			RoomNode node = pathfinding.GetNode(neighbor);
 
 			if (node == null) continue;
 			if (!node.IsWalkable)
@@ -212,7 +230,7 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 		// If can occupy the space or all neighbors are walkable then return with the position
 		if (canOccupySpace)
 		{
-			_position = Pathfinding.GridSystem.GetConvertedWorldPosition(position);
+			_position = pathfinding.GetWorldPosition(gridPos);
 			return true;
 		}
 
@@ -234,15 +252,10 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 
 		foreach (var edge in HallwayPaths)
 		{
-			GridSystem.GridPosition startingPos = Pathfinding.GridSystem.GetGridPosition(edge.A.VPoint);
-			GridSystem.GridPosition end = Pathfinding.GridSystem.GetGridPosition(edge.B.VPoint);
+			GridPosition startingPos = pathfinding.GetGridPosition(edge.A.VPoint);
+			GridPosition end = pathfinding.GetGridPosition(edge.B.VPoint);
 
-			// Set Node type to hallway nodes
-			Pathfinding.GetNode(startingPos).SetToHallway();
-			Pathfinding.GetNode(end).SetToHallway();
-
-			// Debug.Log($"Path from {startingPos} to {end}");
-			List<GridSystem.GridPosition> paths = Pathfinding.FindPath(
+			List<GridPosition> paths = pathfinding.FindPath(
 				startingPos,
 				end,
 				new PathFinding<RoomNode>.TentativeGCostDelegate(RoomNode.CalculateTentativeGCost));
@@ -251,8 +264,9 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 
 			for (int i = 0; i < paths.Count; i++)  // Notice we're using paths.Count, not paths.Count - 1
 			{
-				GridSystem.GridPosition currentPos = paths[i];
-				Paths.Add(currentPos);
+				GridPosition pos = paths[i];
+				pathfinding.GetNode(pos).SetToFloor();
+				Paths.Add(pos);
 			}
 		}
 	}

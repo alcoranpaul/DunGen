@@ -37,7 +37,7 @@ public class ModelGenerator
 		DestroyDungeon();
 		SpawnFloors();
 		SpawnRooms();
-
+		SpawnDebugNodes();
 		// Spawn floor-walls
 		// Spawn doors
 		// Should defined by rules
@@ -59,17 +59,43 @@ public class ModelGenerator
 		}
 	}
 
+	private void SpawnDebugNodes()
+	{
+		foreach (var node in dataGenerator.NodeObjects)
+		{
+			Vector3 pos = dataGenerator.ToVector3(node);
+			Color color;
+			switch (node.NodeType)
+			{
+				case RoomNode.RoomType.Room:
+					color = Color.Red;
+					break;
+				case RoomNode.RoomType.Floor:
+					color = Color.Blue;
+					break;
+				case RoomNode.RoomType.Hallway:
+					color = Color.Green;
+					break;
+				default:
+					color = Color.White;
+
+					break;
+			}
+			DebugDraw.DrawText($"{node.NodeType}", pos, color, 8, 60f);
+		}
+	}
+
 	private void SpawnFloors()
 	{
 
 		foreach (GridSystem.GridPosition nodePos in dataGenerator.Paths)
 		{
-			Vector3 pos = dataGenerator.Pathfinding.GridSystem.GetWorldPosition(nodePos);
+			Vector3 pos = dataGenerator.ToVector3(nodePos);
 			Actor floor = PrefabManager.SpawnPrefab(Settings.DebugSetting.FloorPrefab, pos, Quaternion.Identity);
 			floor.Parent = dungeonGenActor;
 
 
-			DebugDraw.DrawText($"Floor Node", pos, Color.Blue, 8, 60f);
+			// DebugDraw.DrawText($"Floor Node", pos, Color.Blue, 8, 60f);
 
 		}
 	}
@@ -88,13 +114,13 @@ public class ModelGenerator
 			model.SetMaterial(0, Settings.DebugSetting.Material);
 
 			Debug.Log($"Room: {room}... NeightborCount: {room.NeighborNodes.Count}");
-			foreach (var neighborGridPos in room.NeighborNodes)
-			{
-				// BoundingSphere boundingSphere = new BoundingSphere(dataGenerator.Pathfinding.GridSystem.GetWorldPosition(neighborGridPos), 15f);
-				// DebugDraw.DrawSphere(boundingSphere, Color.Red, 60f);
+			// foreach (var neighborGridPos in room.NeighborNodes)
+			// {
+			// 	// BoundingSphere boundingSphere = new BoundingSphere(dataGenerator.Pathfinding.GridSystem.GetWorldPosition(neighborGridPos), 15f);
+			// 	// DebugDraw.DrawSphere(boundingSphere, Color.Red, 60f);
 
-				DebugDraw.DrawText($"Room Node", dataGenerator.Pathfinding.GridSystem.GetWorldPosition(neighborGridPos), Color.Red, 8, 60f);
-			}
+			// 	DebugDraw.DrawText($"Room Node", dataGenerator.Pathfinding.GridSystem.GetWorldPosition(neighborGridPos), Color.Red, 8, 60f);
+			// }
 		}
 
 	}

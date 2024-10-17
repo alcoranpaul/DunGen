@@ -10,19 +10,19 @@ namespace DunGen;
 /// </summary>
 public class PathFinding<T> where T : PathNode<T>
 {
-	public GridSystem<T> GridSystem { get; private set; }
+	private GridSystem<T> gridSystem;
 	public delegate void TentativeGCostDelegate(ref int tentativeGCost, T node);
-
+	public T[,] GridObjects => gridSystem.GridObjects;
 
 	public PathFinding(Vector2 dimension, Func<GridSystem<T>, GridPosition, T> createGridObject, float unitScale = 1)
 	{
-		GridSystem = new GridSystem<T>(dimension, unitScale, createGridObject);
+		gridSystem = new GridSystem<T>(dimension, unitScale, createGridObject);
 
 	}
 
 	public PathFinding(int dimension, Func<GridSystem<T>, GridPosition, T> createGridObject, float unitScale = 1)
 	{
-		GridSystem = new GridSystem<T>(new Vector2(dimension), unitScale, createGridObject);
+		gridSystem = new GridSystem<T>(new Vector2(dimension), unitScale, createGridObject);
 
 	}
 
@@ -51,8 +51,8 @@ public class PathFinding<T> where T : PathNode<T>
 	public List<GridPosition> GetNeighborhood(GridPosition basePosition, int Width, int Length)
 	{
 		List<GridPosition> positions = new List<GridPosition>();
-		int gridWidth = GridSystem.ToGridSize(Width);
-		int gridLength = GridSystem.ToGridSize(Length);
+		int gridWidth = gridSystem.ToGridSize(Width);
+		int gridLength = gridSystem.ToGridSize(Length);
 
 		int widthOffset = gridWidth / 2;
 		int lengthOffset = gridLength / 2;
@@ -73,12 +73,12 @@ public class PathFinding<T> where T : PathNode<T>
 
 	public BoundingBox GetBoundingBox()
 	{
-		return GridSystem.GetBoundingBox();
+		return gridSystem.GetBoundingBox();
 	}
 
 	public void SpawnDebugObjects(Prefab debugGridPrefab)
 	{
-		GridSystem.CreateDebugObjects(debugGridPrefab);
+		gridSystem.CreateDebugObjects(debugGridPrefab);
 	}
 
 	public T GetNode(int x, int z)
@@ -89,8 +89,8 @@ public class PathFinding<T> where T : PathNode<T>
 
 	public T GetNode(GridPosition position)
 	{
-		if (!GridSystem.IsPositionValid(position)) return null;
-		return GridSystem.GetGridObject(position);
+		if (!gridSystem.IsPositionValid(position)) return null;
+		return gridSystem.GetGridObject(position);
 	}
 
 	public List<GridPosition> FindPath(GridPosition start, GridPosition end, TentativeGCostDelegate GCostDelegate = null)
@@ -125,15 +125,14 @@ public class PathFinding<T> where T : PathNode<T>
 
 		openList.Add(startNode);
 
-		DebugDraw.DrawSphere(new BoundingSphere(GridSystem.GetWorldPosition(startNode.GridPosition), 15f), Color.DarkRed, 60f);
-
-		Vector3 asd = GridSystem.GetWorldPosition(endNode.GridPosition);
+		Vector3 asd = gridSystem.GetWorldPosition(endNode.GridPosition);
 		asd.Y += 100f;
 
+		// TODO: Enabled by boolean
 		DebugDraw.DrawSphere(new BoundingSphere(asd, 15f), Color.Azure, 60f);
 
-		int dimensionX = (int)GridSystem.Dimension.X;
-		int dimensionY = (int)GridSystem.Dimension.Y;
+		int dimensionX = (int)gridSystem.Dimension.X;
+		int dimensionY = (int)gridSystem.Dimension.Y;
 
 		// Initialize path nodes 
 		// WhatIf: Convert into Parallel Processing
@@ -214,7 +213,7 @@ public class PathFinding<T> where T : PathNode<T>
 					GridPosition newPos = new GridPosition(node.GridPosition.X + x, node.GridPosition.Z + z);
 
 					// Skip if the position is outside the grid bounds
-					if (!GridSystem.IsPositionValid(newPos)) continue;
+					if (!gridSystem.IsPositionValid(newPos)) continue;
 
 					// Get the neighbor node
 					T neighborNode = GetNode(newPos);
@@ -238,17 +237,17 @@ public class PathFinding<T> where T : PathNode<T>
 
 		GridPosition position = node.GridPosition;
 
-		if (GridSystem.IsPositionXValid(position.X - 1))
+		if (gridSystem.IsPositionXValid(position.X - 1))
 			neighboringNodes.Add(GetNode(position.X - 1, position.Z)); // Left
 
 
-		if (GridSystem.IsPositionXValid(position.X + 1))
+		if (gridSystem.IsPositionXValid(position.X + 1))
 			neighboringNodes.Add(GetNode(position.X + 1, position.Z)); // Right
 
-		if (GridSystem.IsPositionZValid(position.Z - 1))
+		if (gridSystem.IsPositionZValid(position.Z - 1))
 			neighboringNodes.Add(GetNode(position.X, position.Z - 1)); // Down
 
-		if (GridSystem.IsPositionZValid(position.Z + 1))
+		if (gridSystem.IsPositionZValid(position.Z + 1))
 			neighboringNodes.Add(GetNode(position.X, position.Z + 1)); // Up
 
 		return neighboringNodes;
@@ -301,7 +300,24 @@ public class PathFinding<T> where T : PathNode<T>
 
 	private void ToggleNodeWalkable(GridPosition position, bool flag)
 	{
-		if (!GridSystem.IsPositionValid(position)) return;
+		if (!gridSystem.IsPositionValid(position)) return;
 		GetNode(position)?.SetWalkable(flag);
 	}
+
+	public GridPosition GetGridPosition(Vector3 position)
+	{
+		return gridSystem.GetGridPosition(position);
+	}
+
+	public Vector3 GetWorldPosition(GridPosition position)
+	{
+		return gridSystem.GetWorldPosition(position);
+	}
+
+	public Vector3 GetWorldPosition(Vector3 position)
+	{
+		return gridSystem.GetWorldPosition(position);
+	}
+
+
 }

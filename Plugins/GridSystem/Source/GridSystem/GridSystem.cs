@@ -173,7 +173,14 @@ public class GridSystem<TGridObject>
 		return new Vector3(offsetX, 0, offsetZ);
 	}
 
-	public Vector3 GetConvertedWorldPosition(Vector3 worldPosition)
+	/// <summary>
+	/// Converts a world position to a grid position
+	/// </summary>
+	/// <remarks>Automatically converts into GridPosition</remarks>
+	/// 
+	/// <param name="worldPosition"></param>
+	/// <returns></returns>
+	public Vector3 GetWorldPosition(Vector3 worldPosition)
 	{
 		GridPosition gridPos = GetGridPosition(worldPosition);
 		return GetWorldPosition(gridPos);

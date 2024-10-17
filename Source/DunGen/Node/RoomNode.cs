@@ -13,7 +13,7 @@ public class RoomNode : PathNode<RoomNode>
 	public RoomType NodeType { get; private set; }  // New property to define node type
 	public RoomNode(GridSystem.GridSystem<RoomNode> gridSystem, GridSystem.GridPosition gridPosition) : base(gridSystem, gridPosition)
 	{
-		SetToOther();
+		SetToNone();
 	}
 
 	public void SetToHallway()
@@ -31,12 +31,30 @@ public class RoomNode : PathNode<RoomNode>
 		NodeType = RoomType.Other;
 	}
 
+	public void SetToFloor()
+	{
+		NodeType = RoomType.Floor;
+	}
+
+	private void SetToNone()
+	{
+		NodeType = RoomType.None;
+	}
+
 	public enum RoomType
 	{
 		Hallway,
 		Room,
-		Other
+		Floor,
+		Other,
+		None
 	}
+
+	public override string ToString()
+	{
+		return $"{base.ToString()} - {NodeType}";
+	}
+
 
 
 	public static void CalculateTentativeGCost(ref int tentativeGCost, RoomNode node)
