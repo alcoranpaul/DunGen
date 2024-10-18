@@ -36,7 +36,7 @@ public class ModelGenerator
 	{
 		DestroyDungeon();
 		SpawnFloors();
-		SpawnRooms();
+		// SpawnRooms();
 		SpawnDebugNodes();
 		// Spawn floor-walls
 		// Spawn doors
@@ -76,6 +76,9 @@ public class ModelGenerator
 				case RoomNode.RoomType.Hallway:
 					color = Color.Green;
 					break;
+				case RoomNode.RoomType.RoomDoor:
+					color = Color.Yellow;
+					break;
 				default:
 					color = Color.White;
 
@@ -87,20 +90,42 @@ public class ModelGenerator
 
 	private void SpawnFloors()
 	{
-
-		foreach (GridSystem.GridPosition nodePos in dataGenerator.Paths)
+		foreach (var node in dataGenerator.NodeObjects)
 		{
-			Vector3 pos = dataGenerator.ToVector3(nodePos);
-			Actor floor = PrefabManager.SpawnPrefab(Settings.DebugSetting.FloorPrefab, pos, Quaternion.Identity);
-			floor.Parent = dungeonGenActor;
+			Vector3 pos = dataGenerator.ToVector3(node);
 
+			Actor floor = null;
+			switch (node.NodeType)
+			{
+				case RoomNode.RoomType.Room:
 
-			// DebugDraw.DrawText($"Floor Node", pos, Color.Blue, 8, 60f);
+					floor = PrefabManager.SpawnPrefab(Settings.DebugSetting.RoomFloorPrefab, pos, Quaternion.Identity);
+					break;
+				case RoomNode.RoomType.Floor:
+
+					floor = PrefabManager.SpawnPrefab(Settings.DebugSetting.HallwayFloorPrefab, pos, Quaternion.Identity);
+					break;
+				case RoomNode.RoomType.RoomDoor:
+					floor = PrefabManager.SpawnPrefab(Settings.DebugSetting.RoomDoorFloorPrefab, pos, Quaternion.Identity);
+					break;
+				default:
+
+					break;
+			}
+			if (floor != null)
+				floor.Parent = dungeonGenActor;
 
 		}
+
+		// foreach (GridSystem.GridPosition nodePos in dataGenerator.Paths)
+		// {
+		// 	Vector3 pos = dataGenerator.ToVector3(nodePos);
+		// 	Actor floor = PrefabManager.SpawnPrefab(Settings.DebugSetting.HallwayFloorPrefab, pos, Quaternion.Identity);
+		// 	floor.Parent = dungeonGenActor;
+		// }
 	}
 
-	private void SpawnRooms()
+	private void SpawnRooms() // For premade rooms
 	{
 		foreach (Room room in dataGenerator.Rooms)
 		{
@@ -112,15 +137,6 @@ public class ModelGenerator
 			childModel.Scale = new Vector3(room.Width, room.Height, room.Length);
 			StaticModel model = childModel as StaticModel;
 			model.SetMaterial(0, Settings.DebugSetting.Material);
-
-			Debug.Log($"Room: {room}... NeightborCount: {room.NeighborNodes.Count}");
-			// foreach (var neighborGridPos in room.NeighborNodes)
-			// {
-			// 	// BoundingSphere boundingSphere = new BoundingSphere(dataGenerator.Pathfinding.GridSystem.GetWorldPosition(neighborGridPos), 15f);
-			// 	// DebugDraw.DrawSphere(boundingSphere, Color.Red, 60f);
-
-			// 	DebugDraw.DrawText($"Room Node", dataGenerator.Pathfinding.GridSystem.GetWorldPosition(neighborGridPos), Color.Red, 8, 60f);
-			// }
 		}
 
 	}

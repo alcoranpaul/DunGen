@@ -20,6 +20,8 @@ public class DungeonGenSettings
 		public Prefab DebugGridPrefab;
 		public Prefab PathfindingDebugPrefab;
 		public Prefab RoomPrefab;
-		public Prefab FloorPrefab;
+		public Prefab HallwayFloorPrefab;
+		public Prefab RoomFloorPrefab;
+		public Prefab RoomDoorFloorPrefab;
 	}
 }

@@ -23,7 +23,9 @@ public class DunGenWindow : CustomEditorWindow
 	public string DEBUG_GRID_PREFAB_NAME = "DebugGrid";
 	public string PATH_NODE_DEBUG_PREFAB_NAME = "PathNodeDebugObject";
 	public string ROOM_PREFAB_NAME = "Room";
-	public string FLOOR_PREFAB_NAME = "Floor";
+	public string HALLWAY_FLOOR_PREFAB = "HallwayFloor";
+	public string ROOM_FLOOR_PREFAB = "RoomFloor";
+	public string ROOM_DOOR_FLOOR_PREFAB = "RoomDoorFloor";
 	public string ROOM_MATERIAL_NAME = "Debug Rooms";
 
 	public const string PREFAB_FOLDER_NAME = "Prefabs";
@@ -367,9 +369,17 @@ public class DunGenWindow : CustomEditorWindow
 			{
 				debugSettings.RoomPrefab = item; // Set the room prefab
 			}
-			else if (fileName == FLOOR_PREFAB_NAME)
+			else if (fileName == HALLWAY_FLOOR_PREFAB)
 			{
-				debugSettings.FloorPrefab = item; // Set the floor prefab
+				debugSettings.HallwayFloorPrefab = item; // Set the floor prefab
+			}
+			else if (fileName == ROOM_FLOOR_PREFAB)
+			{
+				debugSettings.RoomFloorPrefab = item; // Set the room floor prefab
+			}
+			else if (fileName == ROOM_DOOR_FLOOR_PREFAB)
+			{
+				debugSettings.RoomDoorFloorPrefab = item; // Set the room door floor prefab
 			}
 		}
 

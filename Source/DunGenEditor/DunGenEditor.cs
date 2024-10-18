@@ -54,7 +54,8 @@ public class DunGenEditor : EditorPlugin
 
 		isWindowShown = false;
 		_button = Editor.UI.ToolStrip.AddButton("DunGen");
-		dunGenWindow = new DunGenWindow(_description);
+		if (dunGenWindow == null)
+			dunGenWindow = new DunGenWindow(_description);
 		ShowEditorWindow();
 
 		_button.Clicked += ShowEditorWindow;
@@ -63,6 +64,7 @@ public class DunGenEditor : EditorPlugin
 
 	private void ShowEditorWindow()
 	{
+
 		if (isWindowShown)
 		{
 			if (Editor.Instance.Windows.ToolboxWin.ParentDockPanel.TabsCount > 1)
@@ -72,6 +74,8 @@ public class DunGenEditor : EditorPlugin
 
 		if (dunGenWindow == null)
 			dunGenWindow = new DunGenWindow(_description);
+
+
 		dunGenWindow.Show(DockState.DockFill, Editor.Instance.Windows.ToolboxWin.ParentDockPanel, false);
 
 		isWindowShown = true;

@@ -3,8 +3,8 @@
 	"TypeName": "DunGen.DungeonGenSettings",
 	"EngineBuild": 6605,
 	"Data": {
-	"MaxRooms": 10,
-	"Size": 30.0,
+	"MaxRooms": 15,
+	"Size": 50.0,
 	"BoundingBox": {
 		"Minimum": {
 			"X": 0.0,
@@ -22,7 +22,9 @@
 		"DebugGridPrefab": "ee36236c42c3ab7ccb8988b493f6974a",
 		"PathfindingDebugPrefab": "b71b10e044f0a7eb83c1a99fda4c90a1",
 		"RoomPrefab": "f3d896034ca9a3f0966afe81c047c45e",
-		"FloorPrefab": "3e10e49441a0137931b654a1c18b11b7"
+		"HallwayFloorPrefab": "3e10e49441a0137931b654a1c18b11b7",
+		"RoomFloorPrefab": "38809d67499ccf3ae2a4d29a9d00c395",
+		"RoomDoorFloorPrefab": "5cb58ccd4ff20110b2901c8481720b5d"
 	}
 }
 }

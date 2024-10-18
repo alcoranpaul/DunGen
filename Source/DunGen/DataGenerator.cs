@@ -23,6 +23,7 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 	public RoomNode[,] NodeObjects { get { return pathfinding.GridObjects; } }
 	public Vector3 ToVector3(GridPosition pos) => pathfinding.GetWorldPosition(pos);
 	public Vector3 ToVector3(RoomNode node) => pathfinding.GetWorldPosition(node.GridPosition);
+	public RoomNode GetNode(GridPosition pos) => pathfinding.GetNode(pos);
 
 	public DataGenerator()
 	{
@@ -133,11 +134,11 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 		Random rand = new Random();
 
 		// TODO: Have a setting for randomized rooms or predefined rooms
-		int Width = rand.Next(2, 5);
+		int Width = rand.Next(3, 11);
 		int Height = rand.Next(1, 2);
-		int Length = rand.Next(2, 5);
+		int Length = rand.Next(3, 11);
 
-		bool isPositionValid = FindValidRoomPosition(Width, Height, Length, out Vector3 position);
+		bool isPositionValid = FindValidRoomPosition(Width, Height, Length, out Vector3 position, 3, 100);
 
 		if (!isPositionValid) Debug.LogError("No valid position found for room"); // Generate another room? until room count has reached max
 
@@ -174,10 +175,12 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 	/// <param name="Height"></param>
 	/// <param name="Length"></param>
 	/// <param name="_position"></param>
+	/// <param name="nodeOffset"></param>
+	/// <param name="maxAttemps"></param>
 	/// <returns></returns>
-	private bool FindValidRoomPosition(int Width, int Height, int Length, out Vector3 _position)
+	private bool FindValidRoomPosition(int Width, int Height, int Length, out Vector3 _position, int nodeOffset = 0, int maxAttemps = 5)
 	{
-		return FindValidRoomPosition(Width, Height, Length, 5, out _position); // TODO: Set max attempts to a setting
+		return FindValidRoomPosition(Width, Height, Length, maxAttemps, out _position, nodeOffset); // TODO: Set max attempts to a setting
 	}
 
 	/// <summary>
@@ -188,12 +191,14 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 	/// <param name="Length"></param>
 	/// <param name="maxAttemps"></param>
 	/// <param name="_position"></param>
+	/// <param name="nodeOffset"></param>
 	/// <returns></returns>
-	private bool FindValidRoomPosition(int Width, int Height, int Length, int maxAttemps, out Vector3 _position)
+	private bool FindValidRoomPosition(int Width, int Height, int Length, int maxAttemps, out Vector3 _position, int nodeOffset = 0)
 	{
 		if (maxAttemps <= 0)
 		{
 			_position = Vector3.Zero;
+			Debug.Log($"Max attempts reached");
 			return false;
 		}
 
@@ -210,7 +215,7 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 
 		GridPosition gridPos = pathfinding.GetGridPosition(position);
 		// Check neighbors including base position
-		List<GridPosition> neightborhood = pathfinding.GetNeighborhood(gridPos, Width, Length);
+		List<GridPosition> neightborhood = pathfinding.GetNeighborhood(gridPos, Width + nodeOffset, Length + nodeOffset);
 
 
 		bool canOccupySpace = true;
@@ -234,7 +239,7 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 			return true;
 		}
 
-		return FindValidRoomPosition(Width, Height, Length, --maxAttemps, out _position);
+		return FindValidRoomPosition(Width, Height, Length, --maxAttemps, out _position, nodeOffset);
 
 	}
 
@@ -258,15 +263,37 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 			List<GridPosition> paths = pathfinding.FindPath(
 				startingPos,
 				end,
+				out RoomNode startNode,
+				out RoomNode endNode,
 				new PathFinding<RoomNode>.TentativeGCostDelegate(RoomNode.CalculateTentativeGCost));
 
 			if (paths == null) continue;
-
-			for (int i = 0; i < paths.Count; i++)  // Notice we're using paths.Count, not paths.Count - 1
+			// Vector3 post = pathfinding.GetWorldPosition(startNode.GridPosition);
+			// BoundingSphere sphere = new BoundingSphere(post, 15f);
+			// DebugDraw.DrawSphere(sphere, Color.Yellow, 60f);
+			foreach (var pos in paths)
 			{
-				GridPosition pos = paths[i];
-				pathfinding.GetNode(pos).SetToFloor();
+				RoomNode node = pathfinding.GetNode(pos);
+				node.SetToFloor();
+				if (paths.IndexOf(pos) == 0 || paths.IndexOf(pos) == paths.Count - 1)
+					SetRoomDoor(node);
 				Paths.Add(pos);
+			}
+		}
+	}
+
+	private void SetRoomDoor(RoomNode node)
+	{
+		List<RoomNode> rooms = pathfinding.GetCardinalNodes(node);
+		foreach (var room in rooms)
+		{
+			// Vector3 pos = pathfinding.GetWorldPosition(room.GridPosition);
+			// BoundingSphere sphere = new BoundingSphere(pos, 15f);
+			// DebugDraw.DrawSphere(sphere, Color.Yellow, 60f);
+			if (room.NodeType == RoomNode.RoomType.Room)
+			{
+				room.SetToRoorDoor();
+				return;
 			}
 		}
 	}

@@ -10,7 +10,8 @@ namespace DunGen;
 /// </summary>
 public class RoomNode : PathNode<RoomNode>
 {
-	public RoomType NodeType { get; private set; }  // New property to define node type
+	public RoomType NodeType { get; private set; }
+
 	public RoomNode(GridSystem.GridSystem<RoomNode> gridSystem, GridSystem.GridPosition gridPosition) : base(gridSystem, gridPosition)
 	{
 		SetToNone();
@@ -36,6 +37,11 @@ public class RoomNode : PathNode<RoomNode>
 		NodeType = RoomType.Floor;
 	}
 
+	public void SetToRoorDoor()
+	{
+		NodeType = RoomType.RoomDoor;
+	}
+
 	private void SetToNone()
 	{
 		NodeType = RoomType.None;
@@ -46,13 +52,14 @@ public class RoomNode : PathNode<RoomNode>
 		Hallway,
 		Room,
 		Floor,
+		RoomDoor,
 		Other,
 		None
 	}
 
 	public override string ToString()
 	{
-		return $"{base.ToString()} - {NodeType}";
+		return $"{base.ToString()}";
 	}
 
 

@@ -42,7 +42,7 @@ public class PathFinding<T> where T : PathNode<T>
 	}
 
 	/// <summary>
-	/// Returns a list of <see cref="GridPosition"/> based of off <paramref name="Width"/> and <paramref name="Length"/>
+	/// Returns a list of <see cref="GridPosition"/> (in all 8 directions) based of off <paramref name="Width"/> and <paramref name="Length"/>
 	/// </summary>
 	/// <param name="basePosition"></param>
 	/// <param name="Width"></param>
@@ -93,14 +93,14 @@ public class PathFinding<T> where T : PathNode<T>
 		return gridSystem.GetGridObject(position);
 	}
 
-	public List<GridPosition> FindPath(GridPosition start, GridPosition end, TentativeGCostDelegate GCostDelegate = null)
+	public List<GridPosition> FindPath(GridPosition start, GridPosition end, out T startNode, out T endNode, TentativeGCostDelegate GCostDelegate = null)
 	{
 		List<T> openList = new List<T>(); // Nodes to be evaluated
 		List<T> closedList = new List<T>(); // Already visited nodes
 
 		// Add Start node to the open list
-		T startNode = GetNode(start);
-		T endNode = GetNode(end);
+		startNode = GetNode(start);
+		endNode = GetNode(end);
 
 		// Check if start or end node is not walkable
 		if (!startNode.IsWalkable)
@@ -163,7 +163,7 @@ public class PathFinding<T> where T : PathNode<T>
 			openList.Remove(currentNode);
 			closedList.Add(currentNode);
 
-			foreach (T neighbor in GetNeighborNodes(currentNode))
+			foreach (T neighbor in GetCardinalNodes(currentNode))
 			{
 				if (closedList.Contains(neighbor)) continue;
 
@@ -231,7 +231,12 @@ public class PathFinding<T> where T : PathNode<T>
 	}
 
 
-	private List<T> GetNeighborNodes(T node)
+	/// <summary>
+	/// Returns a list of neighboring nodes in the cardinal directions (up, down, left, right)
+	/// </summary>
+	/// <param name="node"></param>
+	/// <returns></returns>
+	public List<T> GetCardinalNodes(T node)
 	{
 		List<T> neighboringNodes = new List<T>();
 
@@ -239,7 +244,6 @@ public class PathFinding<T> where T : PathNode<T>
 
 		if (gridSystem.IsPositionXValid(position.X - 1))
 			neighboringNodes.Add(GetNode(position.X - 1, position.Z)); // Left
-
 
 		if (gridSystem.IsPositionXValid(position.X + 1))
 			neighboringNodes.Add(GetNode(position.X + 1, position.Z)); // Right

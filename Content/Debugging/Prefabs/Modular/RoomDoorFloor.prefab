@@ -1,5 +1,5 @@
 {
-	"ID": "3e10e49441a0137931b654a1c18b11b7",
+	"ID": "5cb58ccd4ff20110b2901c8481720b5d",
 	"TypeName": "FlaxEngine.Prefab",
 	"EngineBuild": 6605,
 	"Data": [
@@ -13,27 +13,20 @@
 		"TypeName": "FlaxEngine.StaticModel",
 		"ParentID": "794bb1a24eb71e116a2c4b8396e9cb9a",
 		"Name": "SM_Floor",
-		"Transform": {
-			"Scale": {
-				"X": 0.5,
-				"Y": 0.5,
-				"Z": 0.5
-			}
-		},
 		"Model": "ad6212574c580a304ef7fb89f495a865",
 		"Buffer": {
 			"Entries": [
 				{
 					"Material": "00000000000000000000000000000000",
-					"ShadowsMode": 3,
+					"ShadowsMode": 0,
 					"Visible": true,
-					"ReceiveDecals": true
+					"ReceiveDecals": false
 				},
 				{
-					"Material": "00000000000000000000000000000000",
-					"ShadowsMode": 3,
+					"Material": "f101a4d64d4b1999f0886a8f935a05b8",
+					"ShadowsMode": 0,
 					"Visible": true,
-					"ReceiveDecals": true
+					"ReceiveDecals": false
 				}
 			]
 		}
