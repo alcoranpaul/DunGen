@@ -16,7 +16,8 @@ public class GridSystem<TGridObject>
 
 	private const float METERS_TO_CM = 100f; // Conversion factor from centimeters to meters
 	public TGridObject[,] GridObjects { get; private set; }
-
+	public int[] DirectionX;
+	public int[] DirectionY;
 
 	public GridSystem(Vector2 dimension, float unitScale, Func<GridSystem<TGridObject>, GridPosition, TGridObject> createGridObject)
 	{
@@ -36,6 +37,8 @@ public class GridSystem<TGridObject>
 				GridObjects[x, z] = createGridObject(this, pos);
 			}
 		}
+		DirectionX = new int[] { 0, 1, 0, -1 };
+		DirectionY = new int[] { 1, 0, -1, 0 };
 	}
 
 	public bool IsPositionValid(GridPosition position)
@@ -90,10 +93,16 @@ public class GridSystem<TGridObject>
 		DrawGridBoundingBox();
 	}
 
+	/// <summary>
+	/// Converts the world size to a grid size. 
+	/// Since even numbers doesnt cover the whole grid node, we add 1 to the world size to make it odd.
+	/// </summary>
+	/// <param name="worldSize"></param>
+	/// <returns></returns>
 	public int ToGridSize(int worldSize)
 	{
-		if (worldSize % 2 != 0) return worldSize;
-		else return worldSize + 1;
+		if (worldSize % 2 != 0) return worldSize; // If the world size is odd, return the world size
+		else return worldSize + 1; // If the world size is even, return the world size + 1
 	}
 
 

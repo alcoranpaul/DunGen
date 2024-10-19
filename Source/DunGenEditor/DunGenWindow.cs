@@ -27,6 +27,10 @@ public class DunGenWindow : CustomEditorWindow
 	public string ROOM_FLOOR_PREFAB = "RoomFloor";
 	public string ROOM_DOOR_FLOOR_PREFAB = "RoomDoorFloor";
 	public string ROOM_MATERIAL_NAME = "Debug Rooms";
+	public string ROMM_NWALL_PREFAB = "NWallPrefab";
+	public string ROMM_SWALL_PREFAB = "SWallPrefab";
+	public string ROMM_EWALL_PREFAB = "EWallPrefab";
+	public string ROMM_WWALL_PREFAB = "WWallPrefab";
 
 	public const string PREFAB_FOLDER_NAME = "Prefabs";
 	public const string MATERIAL_FOLDER_NAME = "Material";
@@ -380,6 +384,22 @@ public class DunGenWindow : CustomEditorWindow
 			else if (fileName == ROOM_DOOR_FLOOR_PREFAB)
 			{
 				debugSettings.RoomDoorFloorPrefab = item; // Set the room door floor prefab
+			}
+			else if (fileName == ROMM_NWALL_PREFAB)
+			{
+				debugSettings.NWallPrefab = item; // Set the room north wall prefab
+			}
+			else if (fileName == ROMM_SWALL_PREFAB)
+			{
+				debugSettings.SWallPrefab = item; // Set the room south wall prefab
+			}
+			else if (fileName == ROMM_EWALL_PREFAB)
+			{
+				debugSettings.EWallPrefab = item; // Set the room east wall prefab
+			}
+			else if (fileName == ROMM_WWALL_PREFAB)
+			{
+				debugSettings.WWallPrefab = item; // Set the room west wall prefab
 			}
 		}
 

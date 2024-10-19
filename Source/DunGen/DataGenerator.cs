@@ -21,9 +21,16 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 	public DungeonGenState State { get; private set; }
 	public GeneratorState GeneratorState { get; private set; }
 	public RoomNode[,] NodeObjects { get { return pathfinding.GridObjects; } }
+
 	public Vector3 ToVector3(GridPosition pos) => pathfinding.GetWorldPosition(pos);
 	public Vector3 ToVector3(RoomNode node) => pathfinding.GetWorldPosition(node.GridPosition);
 	public RoomNode GetNode(GridPosition pos) => pathfinding.GetNode(pos);
+	public float GetHalfUnitScale() => pathfinding.GetHalfUnitScale();
+	public List<GridPosition> GetNeighborhood(GridPosition basePosition) => pathfinding.GetNeighborhood(basePosition);
+	public List<RoomNode> GetCardinalNodes(RoomNode node) => pathfinding.GetCardinalNodes(node);
+	public List<RoomNode> GetCornerNodes(RoomNode node) => pathfinding.GetCornerNodes(node);
+	public int[] DirectionX => pathfinding.GetDirectionX();
+	public int[] DirectionZ => pathfinding.GetDirectionZ();
 
 	public DataGenerator()
 	{
@@ -150,21 +157,29 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 		// Create a Room
 		RoomPosition roomPosition = new RoomPosition(worldPos);
 		newRoom = new Room(roomPosition, Width, Height, Length);
-		newRoom.SetNeighborNodes(pathfinding.GetNeighborhood(gridPos, Width, Length));
+
+		// Set the nodes for the room
+		newRoom.SetOuterNodes(pathfinding.GetOuterNodes(gridPos, Width, Length));
+		newRoom.SetInnerNodes(pathfinding.GetInnerNodes(gridPos, Width, Length));
 
 		// SetNode to RoomNode
 		var baseNode = pathfinding.GetNode(gridPos);
 		baseNode.SetToRoom();
 
-		var neighborNodes = newRoom.NeighborNodes;
-		foreach (GridPosition item in neighborNodes)
+
+		SetNodesToRoom(newRoom.OuterNodesPosition);
+		SetNodesToRoom(newRoom.InnerNodes);
+		return;
+	}
+
+	private void SetNodesToRoom(List<GridPosition> nodes)
+	{
+		foreach (GridPosition item in nodes)
 		{
 			var node = pathfinding.GetNode(item);
 			if (node == null) continue;
 			node.SetToRoom();
-
 		}
-		return;
 	}
 
 

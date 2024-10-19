@@ -1,0 +1,53 @@
+{
+	"ID": "5636e0e442341d0fa33b6d83876f5899",
+	"TypeName": "FlaxEngine.Prefab",
+	"EngineBuild": 6605,
+	"Data": [
+	{
+		"ID": "d8cdbdbb488943376a4d349b5a60e9d7",
+		"TypeName": "FlaxEngine.EmptyActor",
+		"Name": "WWallPrefab"
+	},
+	{
+		"ID": "a5e13fdd4aabdd0ab2f34b87c76abbee",
+		"TypeName": "FlaxEngine.StaticModel",
+		"ParentID": "d8cdbdbb488943376a4d349b5a60e9d7",
+		"Name": "SM_Wall",
+		"Model": "5299ca3c44caeda3fe4a319edeb8b4dd",
+		"Buffer": {
+			"Entries": [
+				{
+					"Material": "00000000000000000000000000000000",
+					"ShadowsMode": 3,
+					"Visible": true,
+					"ReceiveDecals": true
+				},
+				{
+					"Material": "00000000000000000000000000000000",
+					"ShadowsMode": 3,
+					"Visible": true,
+					"ReceiveDecals": true
+				},
+				{
+					"Material": "00000000000000000000000000000000",
+					"ShadowsMode": 3,
+					"Visible": true,
+					"ReceiveDecals": true
+				},
+				{
+					"Material": "00000000000000000000000000000000",
+					"ShadowsMode": 3,
+					"Visible": true,
+					"ReceiveDecals": true
+				},
+				{
+					"Material": "00000000000000000000000000000000",
+					"ShadowsMode": 3,
+					"Visible": true,
+					"ReceiveDecals": true
+				}
+			]
+		}
+	}
+]
+}

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using FlaxEngine;
 
+
 namespace DunGen;
 
 /// <summary>
@@ -39,6 +40,7 @@ public class ModelGenerator
 		// SpawnRooms();
 		SpawnDebugNodes();
 		// Spawn floor-walls
+		SpawnRoomWalls();
 		// Spawn doors
 		// Should defined by rules
 
@@ -125,7 +127,145 @@ public class ModelGenerator
 		// }
 	}
 
-	private void SpawnRooms() // For premade rooms
+	private void SpawnRoomWalls()
+	{
+		foreach (Room room in dataGenerator.Rooms)
+		{
+			var outerNodePositions = room.OuterNodesPosition;
+			foreach (var position in outerNodePositions)
+			{
+				NodeType nType = CalculateNodeType(position);
+				Vector3 pos = dataGenerator.ToVector3(position);
+
+				// Define the relative positions for the cardinal directions
+				int[] dx = dataGenerator.DirectionX;
+				int[] dz = dataGenerator.DirectionZ;
+
+				CardinalDirection[] directions = { CardinalDirection.North, CardinalDirection.East, CardinalDirection.South, CardinalDirection.West };
+
+				if (nType == NodeType.Cardinal)
+				{
+					var dir = GetCardinalDirection(position);
+
+					Actor wall = null;
+
+					switch (dir)
+					{
+						case CardinalDirection.North:
+							GridSystem.GridPosition nPos = new(position.X + dx[0], position.Z + dz[0]);
+							BoundingSphere sphereN = new BoundingSphere(dataGenerator.ToVector3(nPos), 15f);
+							DebugDraw.DrawSphere(sphereN, Color.Red, 60f);
+							wall = PrefabManager.SpawnPrefab(Settings.DebugSetting.NWallPrefab, pos, Quaternion.Identity);
+
+							break;
+						case CardinalDirection.East:
+							GridSystem.GridPosition ePos = new(position.X + dx[1], position.Z + dz[1]);
+							BoundingSphere ephereN = new BoundingSphere(dataGenerator.ToVector3(ePos), 15f);
+							DebugDraw.DrawSphere(ephereN, Color.Blue, 60f);
+
+							wall = PrefabManager.SpawnPrefab(Settings.DebugSetting.EWallPrefab, pos, Quaternion.Identity);
+
+							break;
+						case CardinalDirection.South:
+							GridSystem.GridPosition sPos = new(position.X + dx[2], position.Z + dz[2]);
+							BoundingSphere ssphereN = new BoundingSphere(dataGenerator.ToVector3(sPos), 15f);
+							DebugDraw.DrawSphere(ssphereN, Color.Yellow, 60f);
+
+							wall = PrefabManager.SpawnPrefab(Settings.DebugSetting.SWallPrefab, pos, Quaternion.Identity);
+
+							break;
+						case CardinalDirection.West:
+							GridSystem.GridPosition wPos = new(position.X + dx[3], position.Z + dz[3]);
+							BoundingSphere wsphereN = new BoundingSphere(dataGenerator.ToVector3(wPos), 15f);
+							DebugDraw.DrawSphere(wsphereN, Color.Pink, 60f);
+
+							wall = PrefabManager.SpawnPrefab(Settings.DebugSetting.WWallPrefab, pos, Quaternion.Identity);
+
+							break;
+						default:
+							break;
+					}
+					wall.Parent = dungeonGenActor;
+				}
+
+				pos.Y += 20f;
+				DebugDraw.DrawText($"{nType}", pos, Color.LightGreen, 8, 60f);
+
+				// IF corner then find 
+				// float half = dataGenerator.GetHalfUnitScale();
+				// Vector3 north = pos;
+				// Vector3 south = pos;
+				// Vector3 east = pos;
+				// Vector3 west = pos;
+				// north.Z += half; // Up
+				// north.Y += 50f;
+				// south.Z -= half; // Down
+				// south.Y += 50f;
+				// east.X += half; // Left
+				// east.Y += 50f;
+				// west.X -= half; // Right
+				// west.Y += 50f;
+				// BoundingSphere sphereN = new BoundingSphere(north, 15f);
+				// BoundingSphere sphereS = new BoundingSphere(south, 15f);
+				// BoundingSphere sphereE = new BoundingSphere(east, 15f);
+				// BoundingSphere sphereW = new BoundingSphere(west, 15f);
+				// DebugDraw.DrawSphere(sphereN, Color.Red, 60f);
+				// DebugDraw.DrawSphere(sphereS, Color.Yellow, 60f);
+				// DebugDraw.DrawSphere(sphereE, Color.Orange, 60f);
+				// DebugDraw.DrawSphere(sphereW, Color.Green, 60f);
+				// Vector3 pos = dataGenerator.ToVector3(node);
+				// if (wall != null)
+				// wall.Parent = dungeonGenActor;
+			}
+		}
+	}
+
+	private CardinalDirection GetCardinalDirection(GridSystem.GridPosition pos)
+	{
+		// Cardinal directions: North, East, South, West
+		int[] dx = dataGenerator.DirectionX;
+		int[] dz = dataGenerator.DirectionZ;
+		CardinalDirection[] directions = { CardinalDirection.North, CardinalDirection.East, CardinalDirection.South, CardinalDirection.West };
+
+		for (int i = 0; i < 4; i++)
+		{
+			GridSystem.GridPosition neighborPos = new GridSystem.GridPosition(pos.X + dx[i], pos.Z + dz[i]);
+			var neighborNode = dataGenerator.GetNode(neighborPos);
+
+			if (neighborNode == null || (neighborNode.NodeType != RoomNode.RoomType.Room && neighborNode.NodeType != RoomNode.RoomType.RoomDoor))
+			{
+				return directions[i];
+			}
+		}
+
+		// Default return value if all neighbors are valid rooms or room doors
+		return CardinalDirection.North;
+	}
+
+	private NodeType CalculateNodeType(GridSystem.GridPosition pos)
+	{
+		// Check the node's neightbor
+		var neighborhood = dataGenerator.GetNeighborhood(pos);
+		List<GridSystem.GridPosition> validNodes = new List<GridSystem.GridPosition>();
+		foreach (var node in neighborhood)
+		{
+			// Get the Node
+			RoomNode room = dataGenerator.GetNode(node);
+			if (room.NodeType != RoomNode.RoomType.Room && room.NodeType != RoomNode.RoomType.RoomDoor) continue;
+
+			// Check for Cardinal and Cornered Edges
+			if (room.NodeType == RoomNode.RoomType.Room || room.NodeType == RoomNode.RoomType.RoomDoor)
+				validNodes.Add(node);
+
+		}
+
+		NodeType nodeType = NodeType.Cardinal;
+		if (validNodes.Count == 3) nodeType = NodeType.Corner;
+		return nodeType;
+	}
+
+
+	private void SpawnPremadeRooms() // For premade rooms
 	{
 		foreach (Room room in dataGenerator.Rooms)
 		{
@@ -149,5 +289,33 @@ public class ModelGenerator
 			dungeonGenActor.DestroyChildren();
 		}
 
+	}
+
+	private enum CardinalDirection
+	{
+		North,
+		East,
+		South,
+		West
+	}
+
+	private enum CornerDirection
+	{
+		NorthEast,
+		SouthEast,
+		SouthWest,
+		NorthWest
+	}
+
+	private enum NodeType
+	{
+		/// <summary>
+		/// North, East, South, West
+		/// </summary>
+		Cardinal,
+		/// <summary>
+		/// North-East, South-East, South-West, North-West
+		/// </summary>
+		Corner
 	}
 }

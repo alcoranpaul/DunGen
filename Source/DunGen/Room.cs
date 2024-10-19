@@ -9,12 +9,23 @@ namespace DunGen;
 /// </summary>
 public class Room
 {
+	public enum RoomNodeType
+	{
+		Wall,
+		Door,
+		None
+	}
+
+	public RoomNodeType NodeType { get; private set; }
 	public RoomPosition RoomPosition { get; private set; }
 	public int Width { get; private set; }
 	public int Length { get; private set; }
 	public int Height { get; private set; }
 	public Actor ModelActor { get; private set; }
-	public List<GridSystem.GridPosition> NeighborNodes { get; private set; }
+	// public List<GridSystem.GridPosition> Nodes { get; private set; }
+	public List<GridSystem.GridPosition> OuterNodesPosition { get; private set; }
+	public List<GridSystem.GridPosition> InnerNodes { get; private set; }
+
 
 	public Room(RoomPosition roomPosition, int width, int height, int length, Actor modelActor = null)
 	{
@@ -23,7 +34,7 @@ public class Room
 		Length = length;
 		Height = height;
 		ModelActor = modelActor;
-		//TODO: Add neighbor nodes 
+		SetNodeType(RoomNodeType.None);
 	}
 
 	public override string ToString()
@@ -31,9 +42,19 @@ public class Room
 		return $"({RoomPosition.X}, {RoomPosition.Z}) -- [{Width}x{Length}x{Height}]";
 	}
 
-	public void SetNeighborNodes(List<GridSystem.GridPosition> neighborNodes)
+	public void SetNodeType(RoomNodeType nodeType)
 	{
-		NeighborNodes = neighborNodes;
+		NodeType = nodeType;
+	}
+
+	public void SetOuterNodes(List<GridSystem.GridPosition> outerNodes)
+	{
+		OuterNodesPosition = outerNodes;
+	}
+
+	public void SetInnerNodes(List<GridSystem.GridPosition> innerNodes)
+	{
+		InnerNodes = innerNodes;
 	}
 
 }
@@ -42,7 +63,6 @@ public struct RoomPosition
 {
 	public int X;
 	public int Z;
-	public readonly Vector2 Position2D => new Vector2(X, Z);
 	public readonly Vector3 Position3D => new Vector3(X, 0, Z);
 
 	public RoomPosition(int x, int z)

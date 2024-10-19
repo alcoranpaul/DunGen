@@ -10,7 +10,7 @@ namespace DunGen;
 /// </summary>
 public class PathFinding<T> where T : PathNode<T>
 {
-	private GridSystem<T> gridSystem;
+	private readonly GridSystem<T> gridSystem;
 	public delegate void TentativeGCostDelegate(ref int tentativeGCost, T node);
 	public T[,] GridObjects => gridSystem.GridObjects;
 
@@ -62,6 +62,117 @@ public class PathFinding<T> where T : PathNode<T>
 		{
 			for (int j = 0; j < gridLength; j++)
 			{
+				GridPosition pos = new GridPosition(basePosition.X - widthOffset + i, basePosition.Z - lengthOffset + j);
+				positions.Add(pos);
+			}
+		}
+
+		return positions;
+	}
+
+
+	/// <summary>
+	/// Returns a list of <see cref="GridPosition"/> representing the immediate neighbors (1-unit grid radius) around the base position.
+	/// </summary>
+	/// <param name="basePosition"></param>
+	/// <returns></returns>
+	public List<GridPosition> GetNeighborhood(GridPosition basePosition)
+	{
+		List<GridPosition> positions = new List<GridPosition>();
+
+		// Define the relative positions for the 8 possible neighbors
+		int[] dx = { -1, 0, 1, -1, 1, -1, 0, 1 };
+		int[] dz = { -1, -1, -1, 0, 0, 1, 1, 1 };
+
+		for (int i = 0; i < 8; i++)
+		{
+			GridPosition pos = new GridPosition(basePosition.X + dx[i], basePosition.Z + dz[i]);
+			if (gridSystem.IsPositionValid(pos))
+			{
+				positions.Add(pos);
+			}
+		}
+
+		return positions;
+	}
+
+	/// <summary>
+	/// Returns a list of <see cref="GridPosition"/> representing the outer nodes (most edges) based on <paramref name="Width"/> and <paramref name="Length"/>
+	/// </summary>
+	/// <param name="basePosition">The base position around which the outer nodes are calculated.</param>
+	/// <param name="Width">The width of the grid area.</param>
+	/// <param name="Length">The length of the grid area.</param>
+	/// <returns>A list of <see cref="GridPosition"/> representing the outer nodes.</returns>
+	public List<GridPosition> GetOuterNodes(GridPosition basePosition, int Width, int Length)
+	{
+		// Initialize the list to hold the positions of the outer nodes
+		List<GridPosition> positions = new List<GridPosition>();
+
+		// Convert the width and length to grid sizes
+		int gridWidth = gridSystem.ToGridSize(Width);
+		int gridLength = gridSystem.ToGridSize(Length);
+
+		// Calculate the offsets to center the grid around the base position
+		int widthOffset = gridWidth / 2;
+		int lengthOffset = gridLength / 2;
+
+		if (gridSystem.Dimension.X - gridWidth < 0) gridWidth = (int)gridSystem.Dimension.X;
+		if (gridSystem.Dimension.Y - gridLength < 0) gridLength = (int)gridSystem.Dimension.Y;
+		// Iterate through the grid dimensions
+		for (int i = 0; i < gridWidth; i++)
+		{
+			for (int j = 0; j < gridLength; j++)
+			{
+				// Include only the outer nodes (first and last rows and columns)
+				if (i == 0 || i == gridWidth - 1 || j == 0 || j == gridLength - 1)
+				{
+					int x = basePosition.X - widthOffset + i;
+					int z = basePosition.Z - lengthOffset + j;
+					if (x < 0) x = 0;
+					if (z < 0) z = 0;
+					// Calculate the grid position based on the base position and offsets
+					GridPosition pos = new GridPosition(x, z);
+
+					// Check if the position is valid within the grid system
+					if (!gridSystem.IsPositionValid(pos)) continue;
+
+					// Add the valid outer node position to the list
+					positions.Add(pos);
+				}
+			}
+		}
+
+		// Return the list of outer node positions
+		return positions;
+	}
+
+	/// <summary>
+	/// Returns a list of <see cref="GridPosition"/> representing the inner nodes excluding the outer nodes based on <paramref name="Width"/> and <paramref name="Length"/>
+	/// </summary>
+	/// <param name="basePosition"></param>
+	/// <param name="Width"></param>
+	/// <param name="Length"></param>
+	/// <returns></returns>
+	public List<GridPosition> GetInnerNodes(GridPosition basePosition, int Width, int Length)
+	{
+		List<GridPosition> positions = new List<GridPosition>();
+		int gridWidth = gridSystem.ToGridSize(Width);
+		int gridLength = gridSystem.ToGridSize(Length);
+
+		int widthOffset = gridWidth / 2;
+		int lengthOffset = gridLength / 2;
+
+		if (gridSystem.Dimension.X - gridWidth < 0) gridWidth = (int)gridSystem.Dimension.X;
+		if (gridSystem.Dimension.Y - gridLength < 0) gridLength = (int)gridSystem.Dimension.Y;
+		for (int i = 1; i < gridWidth - 1; i++)
+		{
+			for (int j = 1; j < gridLength - 1; j++)
+			{
+
+				int x = basePosition.X - widthOffset + i;
+				int z = basePosition.Z - lengthOffset + j;
+				if (x < 0) x = 0;
+				if (z < 0) z = 0;
 				GridPosition pos = new GridPosition(basePosition.X - widthOffset + i, basePosition.Z - lengthOffset + j);
 				positions.Add(pos);
 			}
@@ -256,7 +367,35 @@ public class PathFinding<T> where T : PathNode<T>
 
 		return neighboringNodes;
 	}
+	/// <summary>
+	/// Returns a list of neighboring nodes in the edge directions (North-East, North-West, South-West, South-East)
+	/// </summary>
+	/// <param name="node"></param>
+	/// <returns></returns>
+	public List<T> GetCornerNodes(T node)
+	{
+		List<T> neighboringNodes = new List<T>();
 
+		GridPosition position = node.GridPosition;
+
+		// Check North-East
+		if (gridSystem.IsPositionXValid(position.X + 1) && gridSystem.IsPositionZValid(position.Z + 1))
+			neighboringNodes.Add(GetNode(position.X + 1, position.Z + 1));
+
+		// Check North-West
+		if (gridSystem.IsPositionXValid(position.X - 1) && gridSystem.IsPositionZValid(position.Z + 1))
+			neighboringNodes.Add(GetNode(position.X - 1, position.Z + 1));
+
+		// Check South-West
+		if (gridSystem.IsPositionXValid(position.X - 1) && gridSystem.IsPositionZValid(position.Z - 1))
+			neighboringNodes.Add(GetNode(position.X - 1, position.Z - 1));
+
+		// Check South-East
+		if (gridSystem.IsPositionXValid(position.X + 1) && gridSystem.IsPositionZValid(position.Z - 1))
+			neighboringNodes.Add(GetNode(position.X + 1, position.Z - 1));
+
+		return neighboringNodes;
+	}
 
 	private List<GridPosition> CalculatePath(T endNode)
 	{
@@ -322,6 +461,14 @@ public class PathFinding<T> where T : PathNode<T>
 	{
 		return gridSystem.GetWorldPosition(position);
 	}
+
+	public float GetHalfUnitScale()
+	{
+		return gridSystem.UnitScale / 2;
+	}
+
+	public int[] GetDirectionX() => gridSystem.DirectionX;
+	public int[] GetDirectionZ() => gridSystem.DirectionY;
 
 
 }

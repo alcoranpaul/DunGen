@@ -24,7 +24,11 @@
 		"RoomPrefab": "f3d896034ca9a3f0966afe81c047c45e",
 		"HallwayFloorPrefab": "3e10e49441a0137931b654a1c18b11b7",
 		"RoomFloorPrefab": "38809d67499ccf3ae2a4d29a9d00c395",
-		"RoomDoorFloorPrefab": "5cb58ccd4ff20110b2901c8481720b5d"
+		"RoomDoorFloorPrefab": "5cb58ccd4ff20110b2901c8481720b5d",
+		"NWallPrefab": "5ec844a1442f1f378f034e8004f5de34",
+		"SWallPrefab": "2bafc1ab492bac3eb2a61bbd2de2350d",
+		"EWallPrefab": "5636e0e442341d0fa33b6d83876f5899",
+		"WWallPrefab": "e72e4da04ff68a89e0ef3c9a9cde162a"
 	}
 }
 }
