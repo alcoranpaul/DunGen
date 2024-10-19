@@ -27,10 +27,14 @@ public class DunGenWindow : CustomEditorWindow
 	public string ROOM_FLOOR_PREFAB = "RoomFloor";
 	public string ROOM_DOOR_FLOOR_PREFAB = "RoomDoorFloor";
 	public string ROOM_MATERIAL_NAME = "Debug Rooms";
-	public string ROMM_NWALL_PREFAB = "NWallPrefab";
-	public string ROMM_SWALL_PREFAB = "SWallPrefab";
-	public string ROMM_EWALL_PREFAB = "EWallPrefab";
-	public string ROMM_WWALL_PREFAB = "WWallPrefab";
+	public string ROOM_NWALL_PREFAB = "NWallPrefab";
+	public string ROOM_SWALL_PREFAB = "SWallPrefab";
+	public string ROOM_EWALL_PREFAB = "EWallPrefab";
+	public string ROOM_WWALL_PREFAB = "WWallPrefab";
+	public string ROOM_NDOOR_WALL_PREFAB = "NDoorWallPrefab";
+	public string ROOM_SDOOR_WALL_PREFAB = "SDoorWallPrefab";
+	public string ROOM_EDOOR_WALL_PREFAB = "EDoorWallPrefab";
+	public string ROOM_WDOOR_WALL_PREFAB = "WDoorWallPrefab";
 
 	public const string PREFAB_FOLDER_NAME = "Prefabs";
 	public const string MATERIAL_FOLDER_NAME = "Material";
@@ -385,21 +389,37 @@ public class DunGenWindow : CustomEditorWindow
 			{
 				debugSettings.RoomDoorFloorPrefab = item; // Set the room door floor prefab
 			}
-			else if (fileName == ROMM_NWALL_PREFAB)
+			else if (fileName == ROOM_NWALL_PREFAB)
 			{
-				debugSettings.NWallPrefab = item; // Set the room north wall prefab
+				debugSettings.WallPrefab.NPrefab = item; // Set the room north wall prefab
 			}
-			else if (fileName == ROMM_SWALL_PREFAB)
+			else if (fileName == ROOM_SWALL_PREFAB)
 			{
-				debugSettings.SWallPrefab = item; // Set the room south wall prefab
+				debugSettings.WallPrefab.SPrefab = item; // Set the room south wall prefab
 			}
-			else if (fileName == ROMM_EWALL_PREFAB)
+			else if (fileName == ROOM_EWALL_PREFAB)
 			{
-				debugSettings.EWallPrefab = item; // Set the room east wall prefab
+				debugSettings.WallPrefab.EPrefab = item; // Set the room east wall prefab
 			}
-			else if (fileName == ROMM_WWALL_PREFAB)
+			else if (fileName == ROOM_WWALL_PREFAB)
 			{
-				debugSettings.WWallPrefab = item; // Set the room west wall prefab
+				debugSettings.WallPrefab.WPrefab = item; // Set the room west wall prefab
+			}
+			else if (fileName == ROOM_NDOOR_WALL_PREFAB)
+			{
+				debugSettings.DoorPrefab.NPrefab = item; // Set the room north door wall prefab
+			}
+			else if (fileName == ROOM_SDOOR_WALL_PREFAB)
+			{
+				debugSettings.DoorPrefab.SPrefab = item; // Set the room south door wall prefab
+			}
+			else if (fileName == ROOM_EDOOR_WALL_PREFAB)
+			{
+				debugSettings.DoorPrefab.EPrefab = item; // Set the room east door wall prefab
+			}
+			else if (fileName == ROOM_WDOOR_WALL_PREFAB)
+			{
+				debugSettings.DoorPrefab.WPrefab = item; // Set the room west door wall prefab
 			}
 		}
 

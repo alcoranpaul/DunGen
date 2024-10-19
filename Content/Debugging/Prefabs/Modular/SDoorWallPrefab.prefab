@@ -1,0 +1,48 @@
+{
+	"ID": "f56a9bb348d80a387c88ce8c4b5dee4d",
+	"TypeName": "FlaxEngine.Prefab",
+	"EngineBuild": 6605,
+	"Data": [
+	{
+		"ID": "48ee3ff6412405559f8132a40ec051fb",
+		"TypeName": "FlaxEngine.EmptyActor",
+		"ParentID": "00000000000000000000000000000000",
+		"Name": "SDoorWallPrefab"
+	},
+	{
+		"ID": "db7bf68e40942e3beaa05f90f8a8f652",
+		"TypeName": "FlaxEngine.StaticModel",
+		"ParentID": "48ee3ff6412405559f8132a40ec051fb",
+		"Name": "SM_Door",
+		"Model": "cabfe7c842f571324b721189d383be61",
+		"Buffer": {
+			"Entries": [
+				{
+					"Material": "00000000000000000000000000000000",
+					"ShadowsMode": 3,
+					"Visible": true,
+					"ReceiveDecals": true
+				},
+				{
+					"Material": "00000000000000000000000000000000",
+					"ShadowsMode": 3,
+					"Visible": true,
+					"ReceiveDecals": true
+				},
+				{
+					"Material": "00000000000000000000000000000000",
+					"ShadowsMode": 3,
+					"Visible": true,
+					"ReceiveDecals": true
+				},
+				{
+					"Material": "00000000000000000000000000000000",
+					"ShadowsMode": 3,
+					"Visible": true,
+					"ReceiveDecals": true
+				}
+			]
+		}
+	}
+]
+}

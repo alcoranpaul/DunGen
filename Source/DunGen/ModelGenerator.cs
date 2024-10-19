@@ -86,7 +86,7 @@ public class ModelGenerator
 
 					break;
 			}
-			DebugDraw.DrawText($"{node.NodeType}", pos, color, 8, 60f);
+			// DebugDraw.DrawText($"{node.NodeType}", pos, color, 8, 60f);
 		}
 	}
 
@@ -118,105 +118,149 @@ public class ModelGenerator
 				floor.Parent = dungeonGenActor;
 
 		}
-
-		// foreach (GridSystem.GridPosition nodePos in dataGenerator.Paths)
-		// {
-		// 	Vector3 pos = dataGenerator.ToVector3(nodePos);
-		// 	Actor floor = PrefabManager.SpawnPrefab(Settings.DebugSetting.HallwayFloorPrefab, pos, Quaternion.Identity);
-		// 	floor.Parent = dungeonGenActor;
-		// }
 	}
 
 	private void SpawnRoomWalls()
 	{
 		foreach (Room room in dataGenerator.Rooms)
 		{
-			var outerNodePositions = room.OuterNodesPosition;
-			foreach (var position in outerNodePositions)
+			SpawnOuterModels(room);
+		}
+	}
+
+	private void SpawnOuterModels(Room room)
+	{
+		var outerNodePositions = room.OuterNodesPosition;
+		foreach (var position in outerNodePositions)
+		{
+			NodeType nType = CalculateNodeType(position);
+			Vector3 pos = dataGenerator.ToVector3(position);
+
+			// Determine the direction
+			CardinalDirection dir = GetCardinalDirection(position);
+			CornerDirection cornerDir = GetCornerDirection(position);
+
+			// Spawn the appropriate wall or door
+			Actor wall = null;
+			switch (nType)
 			{
-				NodeType nType = CalculateNodeType(position);
-				Vector3 pos = dataGenerator.ToVector3(position);
-
-				// Define the relative positions for the cardinal directions
-				int[] dx = dataGenerator.DirectionX;
-				int[] dz = dataGenerator.DirectionZ;
-
-				CardinalDirection[] directions = { CardinalDirection.North, CardinalDirection.East, CardinalDirection.South, CardinalDirection.West };
-
-				if (nType == NodeType.Cardinal)
-				{
-					var dir = GetCardinalDirection(position);
-
-					Actor wall = null;
-
-					switch (dir)
-					{
-						case CardinalDirection.North:
-							GridSystem.GridPosition nPos = new(position.X + dx[0], position.Z + dz[0]);
-							// BoundingSphere sphereN = new BoundingSphere(dataGenerator.ToVector3(nPos), 15f);
-							// DebugDraw.DrawSphere(sphereN, Color.Red, 60f);
-							wall = PrefabManager.SpawnPrefab(Settings.DebugSetting.NWallPrefab, pos, Quaternion.Identity);
-
-							break;
-						case CardinalDirection.East:
-							GridSystem.GridPosition ePos = new(position.X + dx[1], position.Z + dz[1]);
-							// BoundingSphere ephereN = new BoundingSphere(dataGenerator.ToVector3(ePos), 15f);
-							// DebugDraw.DrawSphere(ephereN, Color.Blue, 60f);
-
-							wall = PrefabManager.SpawnPrefab(Settings.DebugSetting.EWallPrefab, pos, Quaternion.Identity);
-
-							break;
-						case CardinalDirection.South:
-							GridSystem.GridPosition sPos = new(position.X + dx[2], position.Z + dz[2]);
-							// BoundingSphere ssphereN = new BoundingSphere(dataGenerator.ToVector3(sPos), 15f);
-							// DebugDraw.DrawSphere(ssphereN, Color.Yellow, 60f);
-
-							wall = PrefabManager.SpawnPrefab(Settings.DebugSetting.SWallPrefab, pos, Quaternion.Identity);
-
-							break;
-						case CardinalDirection.West:
-							GridSystem.GridPosition wPos = new(position.X + dx[3], position.Z + dz[3]);
-							// BoundingSphere wsphereN = new BoundingSphere(dataGenerator.ToVector3(wPos), 15f);
-							// DebugDraw.DrawSphere(wsphereN, Color.Pink, 60f);
-
-							wall = PrefabManager.SpawnPrefab(Settings.DebugSetting.WWallPrefab, pos, Quaternion.Identity);
-
-							break;
-						default:
-							break;
-					}
-					wall.Parent = dungeonGenActor;
-				}
-
-				pos.Y += 20f;
-				DebugDraw.DrawText($"{nType}", pos, Color.LightGreen, 8, 60f);
-
-				// IF corner then find 
-				// float half = dataGenerator.GetHalfUnitScale();
-				// Vector3 north = pos;
-				// Vector3 south = pos;
-				// Vector3 east = pos;
-				// Vector3 west = pos;
-				// north.Z += half; // Up
-				// north.Y += 50f;
-				// south.Z -= half; // Down
-				// south.Y += 50f;
-				// east.X += half; // Left
-				// east.Y += 50f;
-				// west.X -= half; // Right
-				// west.Y += 50f;
-				// BoundingSphere sphereN = new BoundingSphere(north, 15f);
-				// BoundingSphere sphereS = new BoundingSphere(south, 15f);
-				// BoundingSphere sphereE = new BoundingSphere(east, 15f);
-				// BoundingSphere sphereW = new BoundingSphere(west, 15f);
-				// DebugDraw.DrawSphere(sphereN, Color.Red, 60f);
-				// DebugDraw.DrawSphere(sphereS, Color.Yellow, 60f);
-				// DebugDraw.DrawSphere(sphereE, Color.Orange, 60f);
-				// DebugDraw.DrawSphere(sphereW, Color.Green, 60f);
-				// Vector3 pos = dataGenerator.ToVector3(node);
-				// if (wall != null)
-				// wall.Parent = dungeonGenActor;
+				case NodeType.Cardinal:
+					wall = SpawnWall(dir, pos);
+					break;
+				case NodeType.Door:
+					wall = SpawnDoor(dir, pos);
+					break;
+				case NodeType.Corner:
+					wall = SpawnCornerWall(cornerDir, pos);
+					break;
+				default:
+					break;
 			}
+
+			if (wall != null)
+				wall.Parent = dungeonGenActor;
+
+			pos.Y += 20f;
+			DebugDraw.DrawText($"{nType}", pos, Color.LightGreen, 8, 60f);
+		}
+	}
+
+	private Actor SpawnWall(CardinalDirection dir, Vector3 pos)
+	{
+		switch (dir)
+		{
+			case CardinalDirection.North:
+				return PrefabManager.SpawnPrefab(Settings.DebugSetting.WallPrefab.NPrefab, pos, Quaternion.Identity);
+			case CardinalDirection.East:
+				return PrefabManager.SpawnPrefab(Settings.DebugSetting.WallPrefab.EPrefab, pos, Quaternion.Identity);
+			case CardinalDirection.South:
+				return PrefabManager.SpawnPrefab(Settings.DebugSetting.WallPrefab.SPrefab, pos, Quaternion.Identity);
+			case CardinalDirection.West:
+				return PrefabManager.SpawnPrefab(Settings.DebugSetting.WallPrefab.WPrefab, pos, Quaternion.Identity);
+			default:
+				return null;
+		}
+	}
+
+	private Actor SpawnDoor(CardinalDirection dir, Vector3 pos)
+	{
+		switch (dir)
+		{
+			case CardinalDirection.North:
+				return PrefabManager.SpawnPrefab(Settings.DebugSetting.DoorPrefab.NPrefab, pos, Quaternion.Identity);
+			case CardinalDirection.East:
+				return PrefabManager.SpawnPrefab(Settings.DebugSetting.DoorPrefab.EPrefab, pos, Quaternion.Identity);
+			case CardinalDirection.South:
+				return PrefabManager.SpawnPrefab(Settings.DebugSetting.DoorPrefab.SPrefab, pos, Quaternion.Identity);
+			case CardinalDirection.West:
+				return PrefabManager.SpawnPrefab(Settings.DebugSetting.DoorPrefab.WPrefab, pos, Quaternion.Identity);
+			default:
+				return null;
+		}
+	}
+
+	private Actor SpawnCornerWall(CornerDirection cornerDir, Vector3 pos)
+	{
+		Actor wall = null;
+		switch (cornerDir)
+		{
+			case CornerDirection.NorthEast:
+				DebugDraw.DrawText("NorthEast", pos, Color.LightGreen, 8, 60f);
+				wall = PrefabManager.SpawnPrefab(Settings.DebugSetting.WallPrefab.SPrefab, pos, Quaternion.Identity);
+				wall.Parent = dungeonGenActor;
+				wall = PrefabManager.SpawnPrefab(Settings.DebugSetting.WallPrefab.WPrefab, pos, Quaternion.Identity);
+				break;
+			case CornerDirection.NorthWest:
+				DebugDraw.DrawText("NorthWest", pos, Color.LightBlue, 8, 60f);
+				wall = PrefabManager.SpawnPrefab(Settings.DebugSetting.WallPrefab.SPrefab, pos, Quaternion.Identity);
+				wall.Parent = dungeonGenActor;
+				wall = PrefabManager.SpawnPrefab(Settings.DebugSetting.WallPrefab.EPrefab, pos, Quaternion.Identity);
+				break;
+			case CornerDirection.SouthEast:
+				DebugDraw.DrawText("SouthEast", pos, Color.Linen, 8, 60f);
+				wall = PrefabManager.SpawnPrefab(Settings.DebugSetting.WallPrefab.NPrefab, pos, Quaternion.Identity);
+				wall.Parent = dungeonGenActor;
+				wall = PrefabManager.SpawnPrefab(Settings.DebugSetting.WallPrefab.WPrefab, pos, Quaternion.Identity);
+				break;
+			case CornerDirection.SouthWest:
+				DebugDraw.DrawText("SouthWest", pos, Color.LightGoldenrodYellow, 8, 60f);
+				wall = PrefabManager.SpawnPrefab(Settings.DebugSetting.WallPrefab.NPrefab, pos, Quaternion.Identity);
+				wall.Parent = dungeonGenActor;
+				wall = PrefabManager.SpawnPrefab(Settings.DebugSetting.WallPrefab.EPrefab, pos, Quaternion.Identity);
+				break;
+			default:
+				break;
+		}
+		return wall;
+	}
+
+	private CornerDirection GetCornerDirection(GridSystem.GridPosition pos)
+	{
+		// Cardinal directions: North, East, South, West
+		int[] dx = dataGenerator.DirectionX;
+		int[] dz = dataGenerator.DirectionZ;
+
+		// Check for North
+		GridSystem.GridPosition northPos = new GridSystem.GridPosition(pos.X + dx[0], pos.Z + dz[0]);
+		RoomNode northNode = dataGenerator.GetNode(northPos);
+
+		// Check for East
+		GridSystem.GridPosition eastPos = new GridSystem.GridPosition(pos.X + dx[1], pos.Z + dz[1]);
+		RoomNode eastNode = dataGenerator.GetNode(eastPos);
+
+		// Determine if the north and east nodes are valid
+		bool northValid = northNode != null && (northNode.NodeType == RoomNode.RoomType.Room || northNode.NodeType == RoomNode.RoomType.RoomDoor);
+		bool eastValid = eastNode != null && (eastNode.NodeType == RoomNode.RoomType.Room || eastNode.NodeType == RoomNode.RoomType.RoomDoor);
+
+		if (!northValid)
+		{
+			// North is not valid
+			return eastValid ? CornerDirection.SouthEast : CornerDirection.SouthWest;
+		}
+		else
+		{
+			// North is valid
+			return eastValid ? CornerDirection.NorthEast : CornerDirection.NorthWest;
 		}
 	}
 
@@ -238,13 +282,15 @@ public class ModelGenerator
 			}
 		}
 
-		// Default return value if all neighbors are valid rooms or room doors
 		return CardinalDirection.North;
 	}
 
 	private NodeType CalculateNodeType(GridSystem.GridPosition pos)
 	{
-		// Check the node's neightbor
+		// If room-door then return door
+		if (dataGenerator.GetNode(pos).NodeType == RoomNode.RoomType.RoomDoor) return NodeType.Door;
+
+		// else - Check the node's neightbor
 		var neighborhood = dataGenerator.GetNeighborhood(pos);
 		List<GridSystem.GridPosition> validNodes = new List<GridSystem.GridPosition>();
 		foreach (var node in neighborhood)
@@ -262,6 +308,11 @@ public class ModelGenerator
 		NodeType nodeType = NodeType.Cardinal;
 		if (validNodes.Count == 3) nodeType = NodeType.Corner;
 		return nodeType;
+	}
+
+	private void SpawnDoor(RoomNode node)
+	{
+
 	}
 
 
@@ -316,6 +367,8 @@ public class ModelGenerator
 		/// <summary>
 		/// North-East, South-East, South-West, North-West
 		/// </summary>
-		Corner
+		Corner,
+
+		Door
 	}
 }
