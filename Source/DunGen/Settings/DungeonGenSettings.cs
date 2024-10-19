@@ -13,6 +13,7 @@ public class DungeonGenSettings
 	public float Size = 50f;
 	[HideInEditor] public BoundingBox BoundingBox;
 	public DebugSettings DebugSetting;
+	public RoomSettings RoomSetting = new RoomSettings();
 
 	public class DebugSettings
 	{
@@ -25,6 +26,15 @@ public class DungeonGenSettings
 		public Prefab RoomDoorFloorPrefab;
 		public WallSettings WallPrefab = new WallSettings();
 		public DoorSettings DoorPrefab = new DoorSettings();
+
+	}
+
+	public class RoomSettings
+	{
+		public bool IsRandomDimension = true;
+		public Vector2 WidthDimension = new Vector2(5, 10);
+		public Vector2 HeightDimension = new Vector2(1, 2);
+		public Vector2 LengthDimension = new Vector2(5, 10);
 	}
 
 	public class WallSettings

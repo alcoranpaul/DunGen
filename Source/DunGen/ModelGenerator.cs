@@ -12,32 +12,26 @@ namespace DunGen;
 /// </summary>
 public class ModelGenerator
 {
-	public static ModelGenerator Instance { get; private set; }
 	public DungeonGenSettings Settings { get; private set; }
 
 	private const string ACTOR_NAME = "DungeonGenActor";
 	private readonly DataGenerator dataGenerator;
 	private Actor dungeonGenActor;
 
-	public ModelGenerator(DataGenerator dataGenerator)
+	public ModelGenerator(DataGenerator dataGenerator, DungeonGenSettings settings)
 	{
-		if (Instance == null)
-			Instance = this;
-
-		GetSettings();
 		this.dataGenerator = dataGenerator;
 		SetupActor();
-
-
+		Settings = settings;
 	}
 
-	public void GetSettings()
-	{
-		var settings = Engine.GetCustomSettings("DunGenSettings");
-		if (!settings) Debug.LogError("DunGenSettings does not exists in Engine Custom Settings");
+	// public void GetSettings()
+	// {
+	// 	var settings = Engine.GetCustomSettings("DunGenSettings");
+	// 	if (!settings) Debug.LogError("DunGenSettings does not exists in Engine Custom Settings");
 
-		Settings = settings.CreateInstance<DungeonGenSettings>();
-	}
+	// 	Settings = settings.CreateInstance<DungeonGenSettings>();
+	// }
 
 	public void SpawnModels()
 	{

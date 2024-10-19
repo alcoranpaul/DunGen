@@ -3,7 +3,7 @@
 	"TypeName": "DunGen.DungeonGenSettings",
 	"EngineBuild": 6605,
 	"Data": {
-	"MaxRooms": 10,
+	"MaxRooms": 12,
 	"Size": 50.0,
 	"BoundingBox": {
 		"Minimum": {
@@ -37,6 +37,15 @@
 			"EPrefab": "2816529049ef2258fa2d979232196a20",
 			"WPrefab": "dcd36a8340e6047cf6259994e3da9add"
 		}
+	},
+	"RoomSetting": {
+		"IsRandomDimension": true,
+		"MinWidth": 5,
+		"MaxWidth": 10,
+		"MinHeight": 5,
+		"MaxHeight": 10,
+		"MinLength": 5,
+		"MaxLength": 10
 	}
 }
 }

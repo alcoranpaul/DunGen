@@ -13,7 +13,6 @@ namespace DunGen;
 /// </summary>
 public class DataGenerator // WhatIf: use dependency injection rather than Singleton
 {
-	public static DataGenerator Instance { get; private set; }
 	private PathFinding<RoomNode> pathfinding;
 	public DungeonGenSettings Settings { get; private set; }
 	public List<Room> Rooms { get; private set; }
@@ -32,26 +31,24 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 	public int[] DirectionX => pathfinding.GetDirectionX();
 	public int[] DirectionZ => pathfinding.GetDirectionZ();
 
-	public DataGenerator()
+	public DataGenerator(DungeonGenSettings settings)
 	{
-		if (Instance == null)
-			Instance = this;
 
-		GetSettings();
 		State = DungeonGenState.None;
 		GeneratorState = GeneratorState.None;
 
 		Rooms = new List<Room>();
 		Paths = new HashSet<GridPosition>();
+		Settings = settings;
 	}
 
-	public void GetSettings()
-	{
-		var settings = Engine.GetCustomSettings("DunGenSettings");
-		if (!settings) Debug.LogError("DunGenSettings does not exists in Engine Custom Settings");
+	// public void GetSettings()
+	// {
+	// 	var settings = Engine.GetCustomSettings("DunGenSettings");
+	// 	if (!settings) Debug.LogError("DunGenSettings does not exists in Engine Custom Settings");
 
-		Settings = settings.CreateInstance<DungeonGenSettings>();
-	}
+	// 	Settings = settings.CreateInstance<DungeonGenSettings>();
+	// }
 
 	/// <summary>
 	/// Generates the dungeon data by setting up the grid and pathfinding, destroying existing data,
@@ -149,10 +146,9 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 	{
 		Random rand = new Random();
 
-		// TODO: Have a setting for randomized rooms or predefined rooms
-		int Width = rand.Next(3, 11);
-		int Height = rand.Next(1, 2);
-		int Length = rand.Next(3, 11);
+		int Width = rand.Next((int)Settings.RoomSetting.WidthDimension.X, (int)Settings.RoomSetting.WidthDimension.Y);
+		int Height = rand.Next((int)Settings.RoomSetting.HeightDimension.X, (int)Settings.RoomSetting.HeightDimension.Y);
+		int Length = rand.Next((int)Settings.RoomSetting.LengthDimension.X, (int)Settings.RoomSetting.LengthDimension.Y);
 
 		bool isPositionValid = FindValidRoomPosition(Width, Height, Length, out Vector3 position, 3, 100);
 

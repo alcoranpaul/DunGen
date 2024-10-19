@@ -20,6 +20,7 @@ namespace DunGenEditor;
 public class DunGenWindow : CustomEditorWindow
 {
 	// TODO: make editable via editor
+	#region DebugPrefabNames
 	public string DEBUG_GRID_PREFAB_NAME = "DebugGrid";
 	public string PATH_NODE_DEBUG_PREFAB_NAME = "PathNodeDebugObject";
 	public string ROOM_PREFAB_NAME = "Room";
@@ -27,7 +28,9 @@ public class DunGenWindow : CustomEditorWindow
 	public string ROOM_FLOOR_PREFAB = "RoomFloor";
 	public string ROOM_DOOR_FLOOR_PREFAB = "RoomDoorFloor";
 	public string ROOM_MATERIAL_NAME = "Debug Rooms";
+	#endregion
 
+	#region RoomPrefabNames
 	public string ROOM_NWALL_PREFAB = "NWallPrefab";
 	public string ROOM_SWALL_PREFAB = "SWallPrefab";
 	public string ROOM_EWALL_PREFAB = "EWallPrefab";
@@ -37,7 +40,7 @@ public class DunGenWindow : CustomEditorWindow
 	public string ROOM_SDOOR_WALL_PREFAB = "SDoorWallPrefab";
 	public string ROOM_EDOOR_WALL_PREFAB = "EDoorWallPrefab";
 	public string ROOM_WDOOR_WALL_PREFAB = "WDoorWallPrefab";
-
+	#endregion
 	public const string PREFAB_FOLDER_NAME = "Prefabs";
 	public const string MATERIAL_FOLDER_NAME = "Material";
 
@@ -47,6 +50,7 @@ public class DunGenWindow : CustomEditorWindow
 
 	private DataGenerator dataGenerator;
 	private ModelGenerator modelGenerator;
+	private DungeonGenSettings dunGenSettings;
 
 
 	public DunGenWindow(PluginDescription description)
@@ -60,18 +64,73 @@ public class DunGenWindow : CustomEditorWindow
 		// Debug.Log($"DunGenWindow Initialized");
 		// if (generator == null)
 		// 	generator = new Generator();
-
+		dunGenSettings = GetInstanceSettings();
 		layout.Label("Dungeon Generation (DunGen)", TextAlignment.Center);
 		layout.Space(20);
 
 		// Settings group - location of settings json data
-		var settingsGroup = layout.VerticalPanel();
+		CreateSettingsGroup(layout);
 
+		// Buttons group - Load, Save, Generate
+		CreateButtons(layout);
+
+
+	}
+
+	private void CreateButtons(LayoutElementsContainer layout)
+	{
+		layout.Space(20);
+		var saveButton = layout.Button("Open Settings", Color.DarkGray, $"Open settings file @ {DunGenEditor.SettingsPath}");
+		saveButton.Button.TextColor = Color.Black;
+		saveButton.Button.TextColorHighlighted = Color.Black;
+		saveButton.Button.Bold = true;
+		saveButton.Button.Clicked += OpenData;
+
+		// layout.Space(10);
+		// var saveSettingsButton = layout.Button("Save to Settings", Color.DarkRed);
+		// saveSettingsButton.Button.Clicked += () => SaveToSettings();
+
+		layout.Space(10);
+		var dungeonDataButton = layout.Button("Generate Rooms", Color.DarkRed);
+		dungeonDataButton.Button.Enabled = false;
+		dungeonDataButton.Button.Clicked += () =>
+		{
+			// Issue #21
+			// action = () => dungeonDataButton.Button.Clicked -= () => GeneratePathfinding(dungeonDataButton);
+			// GeneratePathfinding(dungeonDataButton);
+
+		};
+
+		layout.Space(10);
+		var spawnDebugButton = layout.Button("Spawn Debug Dungeon", Color.DarkRed);
+		spawnDebugButton.Button.Clicked += () =>
+		{
+			if (dataGenerator != null) dataGenerator.SpawnGridDebugDungeon();
+		};
+
+		layout.Space(10);
+		var destroyButton = layout.Button("Destroy Dungeon", Color.DarkRed);
+		destroyButton.Button.Clicked += DestroyDungeon;
+
+		layout.Space(15);
+		var generateButton = layout.Button("Generate Final Dungeon", Color.DarkGreen, "Generate the final version of the dungeon");
+		generateButton.Button.Clicked += GenerateFinalDungeon;
+
+
+		layout.Space(20);
+		var githubButton = layout.Button("Open Github Repository", Color.DarkKhaki);
+		githubButton.Button.Clicked += OpenGitHub;
+		githubButton.Button.TextColor = Color.Black;
+		githubButton.Button.TextColorHighlighted = Color.Black;
+	}
+
+	private void CreateSettingsGroup(LayoutElementsContainer layout)
+	{
+		var settingsGroup = layout.VerticalPanel();
 
 		var settingNameHP = layout.HorizontalPanel();
 		settingNameHP.ContainerControl.Height = 20f;
 		settingsGroup.AddElement(settingNameHP);
-
 		settingNameHP.AddElement(CreateLabel(layout, $"Settings Name:", marginLeft: 5));
 		settingNameHP.AddElement(CreateTextBox(layout, DunGenEditor.SETTINGS_NAME, textboxEnabled: false));
 
@@ -91,111 +150,52 @@ public class DunGenWindow : CustomEditorWindow
 		var enableDebugBox = layout.Checkbox("Enable Debug Draw");
 		enabbleDebugHP.AddElement(enableDebugBox);
 		enableDebugBox.CheckBox.StateChanged += ToggleDebugDraw;
+	}
 
-
-
-		// Buttons group - Load, Save, Generate
-		layout.Space(20);
-		var saveButton = layout.Button("Open Settings", Color.DarkGray, $"Open settings file @ {DunGenEditor.SettingsPath}");
-		saveButton.Button.TextColor = Color.Black;
-		saveButton.Button.TextColorHighlighted = Color.Black;
-		saveButton.Button.Bold = true;
-		saveButton.Button.Clicked += OpenData;
-
-		layout.Space(10);
-		var dungeonDataButton = layout.Button("Generate Rooms", Color.DarkRed);
-		dungeonDataButton.Button.Enabled = false;
-		dungeonDataButton.Button.Clicked += () =>
+	private void SaveToSettings()
+	{
+		var asset = Content.Load(DunGenEditor.SettingsPath);
+		if (asset != null)
 		{
-			// Issue #21
-			// action = () => dungeonDataButton.Button.Clicked -= () => GeneratePathfinding(dungeonDataButton);
-			// GeneratePathfinding(dungeonDataButton);
-
-		};
-
-		layout.Space(10);
-		var spawnDebugButton = layout.Button("Spawn Debug Dungeon", Color.DarkRed);
-		spawnDebugButton.Button.Clicked += () => DataGenerator.Instance.SpawnGridDebugDungeon();
-
-		layout.Space(10);
-		var destroyButton = layout.Button("Destroy Dungeon", Color.DarkRed);
-		destroyButton.Button.Clicked += DestroyDungeon;
-
-		layout.Space(15);
-		var generateButton = layout.Button("Generate Final Dungeon", Color.DarkGreen, "Generate the final version of the dungeon");
-		generateButton.Button.Clicked += GenerateFinalDungeon;
-
-
-		layout.Space(20);
-		var githubButton = layout.Button("Open Github Repository", Color.DarkKhaki);
-		githubButton.Button.Clicked += OpenGitHub;
-		githubButton.Button.TextColor = Color.Black;
-		githubButton.Button.TextColorHighlighted = Color.Black;
+			JsonAsset json = asset as JsonAsset;
+			DungeonGenSettings settings = json.GetInstance<DungeonGenSettings>();
+			if (settings == null) Debug.LogWarning("Settings is null");
+			settings = dunGenSettings;
+			Editor.SaveJsonAsset(DunGenEditor.SettingsPath, settings);
+			OpenData();
+		}
 	}
 
-
-	private void GeneratePathfinding(ButtonElement button)
+	private DungeonGenSettings GetInstanceSettings()
 	{
-		// DestroyDungeon();
-		// generator = new DataGenerator();
-		// generator.SetupActor();
-		// generator.GeneratePathfinding();
-		// Debug.Log($"Generate Pathfinding");
-		// button.Button.Text = "Spawn Rooms";
-		// action();
-		// button.Button.Clicked += () => SpawnRooms(button);
-		// action = () => button.Button.Clicked -= () => SpawnRooms(button);
-	}
+		var asset = Content.Load(DunGenEditor.SettingsPath);
+		if (asset == null)
+		{
+			Debug.LogWarning($"Failed to load asset @ {DunGenEditor.SettingsPath} ");
+			return null;
 
-	private void SpawnRooms(ButtonElement button)
-	{
+		}
 
-		// if (DataGenerator.Instance == null)
-		// {
-		// 	Debug.LogWarning("Generator Instance is null");
-		// 	return;
-		// }
-		// Debug.Log($"Spawn Rooms");
-		// generator.GenerateRoomData();
-		// button.Button.Text = "Connect Rooms";
-		// action();
-		// action = () => button.Button.Clicked -= () => ConnectRooms(button);
-		// button.Button.Clicked += () => ConnectRooms(button);
-	}
-	private void ConnectRooms(ButtonElement button)
-	{
-
-		// if (DataGenerator.Instance == null)
-		// {
-		// 	Debug.LogWarning("Generator Instance is null");
-		// 	return;
-		// }
-		// Debug.Log($"Connect Rooms");
-		// generator.GenerateHallwayPaths();
-		// Debug.Log($"GeneratePathfinding Pathfinding null: {generator.Pathfinding == null}");
-		// button.Button.Text = "Generate Rooms";
-		// action();
-		// action = () => button.Button.Clicked -= () => SpawnRooms(button);
-
-		// button.Button.Clicked += () => SpawnRooms(button);
+		if (asset is not JsonAsset)
+		{
+			Debug.LogWarning($"Settings @ {DunGenEditor.SettingsPath} is not a JsonAsset");
+			return null;
+		}
+		JsonAsset json = asset as JsonAsset;
+		return json.GetInstance<DungeonGenSettings>();
 
 	}
-
-
 	private void GenerateFinalDungeon()
 	{
 		DebugDraw.UpdateContext(IntPtr.Zero, float.MaxValue);
-		if (DataGenerator.Instance == null)
-			dataGenerator = new DataGenerator();
-		else
-			dataGenerator = DataGenerator.Instance;
+		dunGenSettings = GetInstanceSettings();
+		if (dataGenerator == null)
+			dataGenerator = new DataGenerator(dunGenSettings);
 
-		if (ModelGenerator.Instance == null)
-			modelGenerator = new ModelGenerator(dataGenerator);
-		else
-			modelGenerator = ModelGenerator.Instance;
+		if (modelGenerator == null)
+			modelGenerator = new ModelGenerator(dataGenerator, dunGenSettings);
 
-		RefreshSettings();
+		// RefreshSettings();
 		dataGenerator.GenerateDungeonData();
 		modelGenerator.SpawnModels();
 
@@ -313,12 +313,12 @@ public class DunGenWindow : CustomEditorWindow
 
 	}
 
-	private void RefreshSettings()
-	{
-		dataGenerator?.GetSettings();
-		modelGenerator?.GetSettings();
+	// private void RefreshSettings()
+	// {
+	// 	dataGenerator?.GetSettings();
+	// 	modelGenerator?.GetSettings();
 
-	}
+	// }
 
 	private DungeonGenSettings.DebugSettings GetDebugSettings()
 	{
