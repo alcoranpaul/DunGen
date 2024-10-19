@@ -166,7 +166,6 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 		var baseNode = pathfinding.GetNode(gridPos);
 		baseNode.SetToRoom();
 
-
 		SetNodesToRoom(newRoom.OuterNodesPosition);
 		SetNodesToRoom(newRoom.InnerNodes);
 		return;

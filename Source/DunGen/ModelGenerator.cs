@@ -153,31 +153,31 @@ public class ModelGenerator
 					{
 						case CardinalDirection.North:
 							GridSystem.GridPosition nPos = new(position.X + dx[0], position.Z + dz[0]);
-							BoundingSphere sphereN = new BoundingSphere(dataGenerator.ToVector3(nPos), 15f);
-							DebugDraw.DrawSphere(sphereN, Color.Red, 60f);
+							// BoundingSphere sphereN = new BoundingSphere(dataGenerator.ToVector3(nPos), 15f);
+							// DebugDraw.DrawSphere(sphereN, Color.Red, 60f);
 							wall = PrefabManager.SpawnPrefab(Settings.DebugSetting.NWallPrefab, pos, Quaternion.Identity);
 
 							break;
 						case CardinalDirection.East:
 							GridSystem.GridPosition ePos = new(position.X + dx[1], position.Z + dz[1]);
-							BoundingSphere ephereN = new BoundingSphere(dataGenerator.ToVector3(ePos), 15f);
-							DebugDraw.DrawSphere(ephereN, Color.Blue, 60f);
+							// BoundingSphere ephereN = new BoundingSphere(dataGenerator.ToVector3(ePos), 15f);
+							// DebugDraw.DrawSphere(ephereN, Color.Blue, 60f);
 
 							wall = PrefabManager.SpawnPrefab(Settings.DebugSetting.EWallPrefab, pos, Quaternion.Identity);
 
 							break;
 						case CardinalDirection.South:
 							GridSystem.GridPosition sPos = new(position.X + dx[2], position.Z + dz[2]);
-							BoundingSphere ssphereN = new BoundingSphere(dataGenerator.ToVector3(sPos), 15f);
-							DebugDraw.DrawSphere(ssphereN, Color.Yellow, 60f);
+							// BoundingSphere ssphereN = new BoundingSphere(dataGenerator.ToVector3(sPos), 15f);
+							// DebugDraw.DrawSphere(ssphereN, Color.Yellow, 60f);
 
 							wall = PrefabManager.SpawnPrefab(Settings.DebugSetting.SWallPrefab, pos, Quaternion.Identity);
 
 							break;
 						case CardinalDirection.West:
 							GridSystem.GridPosition wPos = new(position.X + dx[3], position.Z + dz[3]);
-							BoundingSphere wsphereN = new BoundingSphere(dataGenerator.ToVector3(wPos), 15f);
-							DebugDraw.DrawSphere(wsphereN, Color.Pink, 60f);
+							// BoundingSphere wsphereN = new BoundingSphere(dataGenerator.ToVector3(wPos), 15f);
+							// DebugDraw.DrawSphere(wsphereN, Color.Pink, 60f);
 
 							wall = PrefabManager.SpawnPrefab(Settings.DebugSetting.WWallPrefab, pos, Quaternion.Identity);
 

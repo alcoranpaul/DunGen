@@ -129,7 +129,10 @@ public class PathFinding<T> where T : PathNode<T>
 					int x = basePosition.X - widthOffset + i;
 					int z = basePosition.Z - lengthOffset + j;
 					if (x < 0) x = 0;
+					else if (x >= gridSystem.Dimension.X) x = (int)gridSystem.Dimension.X - 1;
 					if (z < 0) z = 0;
+					else if (z >= gridSystem.Dimension.Y) z = (int)gridSystem.Dimension.Y - 1;
+
 					// Calculate the grid position based on the base position and offsets
 					GridPosition pos = new GridPosition(x, z);
 
@@ -168,11 +171,13 @@ public class PathFinding<T> where T : PathNode<T>
 		{
 			for (int j = 1; j < gridLength - 1; j++)
 			{
-
 				int x = basePosition.X - widthOffset + i;
 				int z = basePosition.Z - lengthOffset + j;
 				if (x < 0) x = 0;
+				else if (x >= gridSystem.Dimension.X) x = (int)gridSystem.Dimension.X - 1;
 				if (z < 0) z = 0;
+				else if (z >= gridSystem.Dimension.Y) z = (int)gridSystem.Dimension.Y - 1;
+
 				GridPosition pos = new GridPosition(basePosition.X - widthOffset + i, basePosition.Z - lengthOffset + j);
 				positions.Add(pos);
 			}
