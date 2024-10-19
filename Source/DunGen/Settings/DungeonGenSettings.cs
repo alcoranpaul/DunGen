@@ -23,8 +23,8 @@ public class DungeonGenSettings
 		public Prefab HallwayFloorPrefab;
 		public Prefab RoomFloorPrefab;
 		public Prefab RoomDoorFloorPrefab;
-		public WallSettings WallPrefab;
-		public DoorSettings DoorPrefab;
+		public WallSettings WallPrefab = new WallSettings();
+		public DoorSettings DoorPrefab = new DoorSettings();
 	}
 
 	public class WallSettings

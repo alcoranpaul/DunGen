@@ -24,14 +24,19 @@ public class ModelGenerator
 		if (Instance == null)
 			Instance = this;
 
-		var settings = Engine.GetCustomSettings("DunGenSettings");
-		if (!settings) Debug.LogError("DunGenSettings does not exists in Engine Custom Settings");
-
-		Settings = settings.CreateInstance<DungeonGenSettings>();
+		GetSettings();
 		this.dataGenerator = dataGenerator;
 		SetupActor();
 
 
+	}
+
+	public void GetSettings()
+	{
+		var settings = Engine.GetCustomSettings("DunGenSettings");
+		if (!settings) Debug.LogError("DunGenSettings does not exists in Engine Custom Settings");
+
+		Settings = settings.CreateInstance<DungeonGenSettings>();
 	}
 
 	public void SpawnModels()

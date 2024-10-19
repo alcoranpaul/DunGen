@@ -193,7 +193,7 @@ public class DunGenWindow : CustomEditorWindow
 		else
 			modelGenerator = ModelGenerator.Instance;
 
-
+		RefreshSettings();
 		dataGenerator.GenerateDungeonData();
 		modelGenerator.SpawnModels();
 
@@ -295,7 +295,7 @@ public class DunGenWindow : CustomEditorWindow
 			Debug.LogWarning($"Failed to load settings @ {DunGenEditor.SettingsPath} ");
 
 			DungeonGenSettings settings = new DungeonGenSettings();
-			settings.DebugSetting = GetDebugAssets();
+			settings.DebugSetting = GetDebugSettings();
 
 			Editor.SaveJsonAsset(DunGenEditor.SettingsPath, settings);
 			GameSettings.SetCustomSettings(DunGenEditor.SETTINGS_NAME, Content.LoadAsync<JsonAsset>(DunGenEditor.SettingsPath));
@@ -311,7 +311,14 @@ public class DunGenWindow : CustomEditorWindow
 
 	}
 
-	private DungeonGenSettings.DebugSettings GetDebugAssets()
+	private void RefreshSettings()
+	{
+		dataGenerator?.GetSettings();
+		modelGenerator?.GetSettings();
+
+	}
+
+	private DungeonGenSettings.DebugSettings GetDebugSettings()
 	{
 		// Construct the paths to the prefab and material directories based on the DunGenEditor.DebugPath
 		string prefabPath = Path.Combine(DunGenEditor.DebugPath, PREFAB_FOLDER_NAME);

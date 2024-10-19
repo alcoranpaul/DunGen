@@ -37,15 +37,20 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 		if (Instance == null)
 			Instance = this;
 
-		var settings = Engine.GetCustomSettings("DunGenSettings");
-		if (!settings) Debug.LogError("DunGenSettings does not exists in Engine Custom Settings");
-
-		Settings = settings.CreateInstance<DungeonGenSettings>();
+		GetSettings();
 		State = DungeonGenState.None;
 		GeneratorState = GeneratorState.None;
 
 		Rooms = new List<Room>();
 		Paths = new HashSet<GridPosition>();
+	}
+
+	public void GetSettings()
+	{
+		var settings = Engine.GetCustomSettings("DunGenSettings");
+		if (!settings) Debug.LogError("DunGenSettings does not exists in Engine Custom Settings");
+
+		Settings = settings.CreateInstance<DungeonGenSettings>();
 	}
 
 	/// <summary>
@@ -125,10 +130,15 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 	private void GenerateRoomData()
 	{
 		ChangeGeneratorState(GeneratorState.SpawningRooms);
-		for (int i = 0; i < Settings.MaxRooms; i++)
+		int spawnedRooms = 0;
+		while (spawnedRooms < Settings.MaxRooms)
 		{
-			GenerateRoom(out Room newRoom);
-			Rooms.Add(newRoom);
+			if (GenerateRoom(out Room newRoom))
+			{
+				Rooms.Add(newRoom);
+				spawnedRooms++;
+			}
+			else Debug.LogWarning("No valid position found for room, generating new room");
 		}
 	}
 
@@ -136,7 +146,7 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 	/// Generates a room by creating a random room size and position, and setting the neighbor nodes for the room
 	/// </summary>
 	/// <param name="newRoom"></param>
-	private void GenerateRoom(out Room newRoom)
+	private bool GenerateRoom(out Room newRoom)
 	{
 		Random rand = new Random();
 
@@ -147,7 +157,11 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 
 		bool isPositionValid = FindValidRoomPosition(Width, Height, Length, out Vector3 position, 3, 100);
 
-		if (!isPositionValid) Debug.LogError("No valid position found for room"); // Generate another room? until room count has reached max
+		if (!isPositionValid)
+		{
+			newRoom = null;
+			return false;
+		}
 
 		GridPosition gridPos = pathfinding.GetGridPosition(position);
 		pathfinding.ToggleNeighborWalkable(gridPos, Width, Length, false); // Set nodes to unwalkable
@@ -168,7 +182,7 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 
 		SetNodesToRoom(newRoom.OuterNodesPosition);
 		SetNodesToRoom(newRoom.InnerNodes);
-		return;
+		return true;
 	}
 
 	private void SetNodesToRoom(List<GridPosition> nodes)
@@ -212,7 +226,6 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 		if (maxAttemps <= 0)
 		{
 			_position = Vector3.Zero;
-			Debug.Log($"Max attempts reached");
 			return false;
 		}
 
