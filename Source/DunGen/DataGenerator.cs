@@ -27,7 +27,7 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 	public RoomNode GetNode(GridPosition pos) => pathfinding.GetNode(pos);
 	public float GetHalfUnitScale() => pathfinding.GetHalfUnitScale();
 	public List<GridPosition> GetNeighborhood(GridPosition basePosition) => pathfinding.GetNeighborhood(basePosition);
-	public List<RoomNode> GetCardinalNodes(RoomNode node) => pathfinding.GetCardinalNodes(node);
+	public List<RoomNode> GetCardinalNodes(GridPosition basePosition) => pathfinding.GetCardinalNodes(basePosition);
 	public List<RoomNode> GetCornerNodes(RoomNode node) => pathfinding.GetCornerNodes(node);
 	public int[] DirectionX => pathfinding.GetDirectionX();
 	public int[] DirectionZ => pathfinding.GetDirectionZ();

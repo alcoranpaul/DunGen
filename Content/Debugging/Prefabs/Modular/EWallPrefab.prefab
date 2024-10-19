@@ -18,31 +18,31 @@
 			"Entries": [
 				{
 					"Material": "00000000000000000000000000000000",
-					"ShadowsMode": 3,
+					"ShadowsMode": 0,
 					"Visible": true,
 					"ReceiveDecals": true
 				},
 				{
 					"Material": "00000000000000000000000000000000",
-					"ShadowsMode": 3,
+					"ShadowsMode": 0,
 					"Visible": true,
 					"ReceiveDecals": true
 				},
 				{
 					"Material": "00000000000000000000000000000000",
-					"ShadowsMode": 3,
+					"ShadowsMode": 0,
 					"Visible": true,
 					"ReceiveDecals": true
 				},
 				{
 					"Material": "00000000000000000000000000000000",
-					"ShadowsMode": 3,
+					"ShadowsMode": 0,
 					"Visible": true,
 					"ReceiveDecals": true
 				},
 				{
 					"Material": "00000000000000000000000000000000",
-					"ShadowsMode": 3,
+					"ShadowsMode": 0,
 					"Visible": true,
 					"ReceiveDecals": true
 				}

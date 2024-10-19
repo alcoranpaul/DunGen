@@ -372,6 +372,32 @@ public class PathFinding<T> where T : PathNode<T>
 
 		return neighboringNodes;
 	}
+
+
+	/// <summary>
+	/// Returns a list of neighboring nodes in the cardinal directions (up, down, left, right)
+	/// </summary>
+	/// <param name="position"></param>
+	/// <returns></returns>
+	public List<T> GetCardinalNodes(GridPosition position)
+	{
+		List<T> neighboringNodes = new List<T>();
+
+
+		if (gridSystem.IsPositionXValid(position.X - 1))
+			neighboringNodes.Add(GetNode(position.X - 1, position.Z)); // Left
+
+		if (gridSystem.IsPositionXValid(position.X + 1))
+			neighboringNodes.Add(GetNode(position.X + 1, position.Z)); // Right
+
+		if (gridSystem.IsPositionZValid(position.Z - 1))
+			neighboringNodes.Add(GetNode(position.X, position.Z - 1)); // Down
+
+		if (gridSystem.IsPositionZValid(position.Z + 1))
+			neighboringNodes.Add(GetNode(position.X, position.Z + 1)); // Up
+
+		return neighboringNodes;
+	}
 	/// <summary>
 	/// Returns a list of neighboring nodes in the edge directions (North-East, North-West, South-West, South-East)
 	/// </summary>

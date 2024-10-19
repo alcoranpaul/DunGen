@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using FlaxEngine;
 
@@ -100,12 +101,11 @@ public class ModelGenerator
 			switch (node.NodeType)
 			{
 				case RoomNode.RoomType.Room:
-
 					floor = PrefabManager.SpawnPrefab(Settings.DebugSetting.RoomFloorPrefab, pos, Quaternion.Identity);
 					break;
 				case RoomNode.RoomType.Floor:
-
 					floor = PrefabManager.SpawnPrefab(Settings.DebugSetting.HallwayFloorPrefab, pos, Quaternion.Identity);
+					SpawnFloorWalls(node.GridPosition);
 					break;
 				case RoomNode.RoomType.RoomDoor:
 					floor = PrefabManager.SpawnPrefab(Settings.DebugSetting.RoomDoorFloorPrefab, pos, Quaternion.Identity);
@@ -118,6 +118,43 @@ public class ModelGenerator
 				floor.Parent = dungeonGenActor;
 
 		}
+	}
+
+	private void SpawnFloorWalls(GridSystem.GridPosition gridPos)
+	{
+		// Cardinal directions: North, East, South, West
+		int[] dx = dataGenerator.DirectionX;
+		int[] dz = dataGenerator.DirectionZ;
+		for (int i = 0; i < 4; i++)
+		{
+			GridSystem.GridPosition neighborPos = new GridSystem.GridPosition(gridPos.X + dx[i], gridPos.Z + dz[i]);
+			var neighborNode = dataGenerator.GetNode(neighborPos);
+
+			bool valid = neighborNode == null || (neighborNode.NodeType != RoomNode.RoomType.Floor && neighborNode.NodeType != RoomNode.RoomType.RoomDoor);
+			if (valid)
+			{
+				Vector3 pos = dataGenerator.ToVector3(gridPos);
+				Actor wall = null;
+				switch (i)
+				{
+					case 0:
+						wall = PrefabManager.SpawnPrefab(Settings.DebugSetting.WallPrefab.NPrefab, pos, Quaternion.Identity);
+						break;
+					case 1:
+						wall = PrefabManager.SpawnPrefab(Settings.DebugSetting.WallPrefab.EPrefab, pos, Quaternion.Identity);
+						break;
+					case 2:
+						wall = PrefabManager.SpawnPrefab(Settings.DebugSetting.WallPrefab.SPrefab, pos, Quaternion.Identity);
+						break;
+					case 3:
+						wall = PrefabManager.SpawnPrefab(Settings.DebugSetting.WallPrefab.WPrefab, pos, Quaternion.Identity);
+						break;
+				}
+				if (wall != null)
+					wall.Parent = dungeonGenActor;
+			}
+		}
+
 	}
 
 	private void SpawnRoomWalls()
@@ -133,25 +170,27 @@ public class ModelGenerator
 		var outerNodePositions = room.OuterNodesPosition;
 		foreach (var position in outerNodePositions)
 		{
-			NodeType nType = CalculateNodeType(position);
-			Vector3 pos = dataGenerator.ToVector3(position);
+			NodeRoomType nType = CalculateRoomNodeType(position);
 
-			// Determine the direction
-			CardinalDirection dir = GetCardinalDirection(position);
-			CornerDirection cornerDir = GetCornerDirection(position);
+			RoomNode.RoomType[] inValid = [RoomNode.RoomType.Room, RoomNode.RoomType.RoomDoor];
+			bool isNotRelatedToRoom(RoomNode room) { return room == null || !inValid.Contains(room.NodeType); }
 
 			// Spawn the appropriate wall or door
 			Actor wall = null;
 			switch (nType)
 			{
-				case NodeType.Cardinal:
-					wall = SpawnWall(dir, pos);
+				case NodeRoomType.Cardinal:
+					wall = SpawnRoomWall(position, isNotRelatedToRoom);
 					break;
-				case NodeType.Door:
-					wall = SpawnDoor(dir, pos);
+				case NodeRoomType.Door:
+					wall = SpawnRoomDoor(position, (RoomNode room) => { return room != null && !inValid.Contains(room.NodeType); });
+					if (wall != null)
+						wall.Parent = dungeonGenActor;
+					wall = SpawnRoomWall(position,
+					 (RoomNode room) => { return room == null; });
 					break;
-				case NodeType.Corner:
-					wall = SpawnCornerWall(cornerDir, pos);
+				case NodeRoomType.Corner:
+					wall = SpawnCornerRoomWall(position);
 					break;
 				default:
 					break;
@@ -160,13 +199,16 @@ public class ModelGenerator
 			if (wall != null)
 				wall.Parent = dungeonGenActor;
 
+			Vector3 pos = dataGenerator.ToVector3(position);
 			pos.Y += 20f;
 			DebugDraw.DrawText($"{nType}", pos, Color.LightGreen, 8, 60f);
 		}
 	}
 
-	private Actor SpawnWall(CardinalDirection dir, Vector3 pos)
+	private Actor SpawnRoomWall(GridSystem.GridPosition gridPos, Func<RoomNode, bool> isValidRoomType)
 	{
+		CardinalDirection dir = CalculateDirection(gridPos, isValidRoomType, out Vector3 pos);
+
 		switch (dir)
 		{
 			case CardinalDirection.North:
@@ -182,8 +224,17 @@ public class ModelGenerator
 		}
 	}
 
-	private Actor SpawnDoor(CardinalDirection dir, Vector3 pos)
+	private CardinalDirection CalculateDirection(GridSystem.GridPosition gridPos, Func<RoomNode, bool> isValidRoomType, out Vector3 worldPos)
 	{
+		worldPos = dataGenerator.ToVector3(gridPos);
+		return GetSingleCardinalDirection(gridPos, isValidRoomType);
+	}
+
+	private Actor SpawnRoomDoor(GridSystem.GridPosition gridPos, Func<RoomNode, bool> isValidRoomType)
+	{
+		// Node that is null or not a room/room-door from the direction of the gridPos
+		CardinalDirection dir = CalculateDirection(gridPos, isValidRoomType, out Vector3 pos);
+
 		switch (dir)
 		{
 			case CardinalDirection.North:
@@ -199,9 +250,12 @@ public class ModelGenerator
 		}
 	}
 
-	private Actor SpawnCornerWall(CornerDirection cornerDir, Vector3 pos)
+	private Actor SpawnCornerRoomWall(GridSystem.GridPosition gridPos)
 	{
+		CornerDirection cornerDir = GetCornerDirection(gridPos);
+		Vector3 pos = dataGenerator.ToVector3(gridPos);
 		Actor wall = null;
+
 		switch (cornerDir)
 		{
 			case CornerDirection.NorthEast:
@@ -264,31 +318,32 @@ public class ModelGenerator
 		}
 	}
 
-	private CardinalDirection GetCardinalDirection(GridSystem.GridPosition pos)
+	private CardinalDirection GetSingleCardinalDirection(GridSystem.GridPosition pos, Func<RoomNode, bool> isValidRoomType)
 	{
 		// Cardinal directions: North, East, South, West
 		int[] dx = dataGenerator.DirectionX;
 		int[] dz = dataGenerator.DirectionZ;
 		CardinalDirection[] directions = { CardinalDirection.North, CardinalDirection.East, CardinalDirection.South, CardinalDirection.West };
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < directions.Length; i++)
 		{
 			GridSystem.GridPosition neighborPos = new GridSystem.GridPosition(pos.X + dx[i], pos.Z + dz[i]);
 			var neighborNode = dataGenerator.GetNode(neighborPos);
 
-			if (neighborNode == null || (neighborNode.NodeType != RoomNode.RoomType.Room && neighborNode.NodeType != RoomNode.RoomType.RoomDoor))
+			if (isValidRoomType(neighborNode))
 			{
 				return directions[i];
 			}
 		}
 
-		return CardinalDirection.North;
+		return CardinalDirection.None;
 	}
 
-	private NodeType CalculateNodeType(GridSystem.GridPosition pos)
+
+	private NodeRoomType CalculateRoomNodeType(GridSystem.GridPosition pos)
 	{
 		// If room-door then return door
-		if (dataGenerator.GetNode(pos).NodeType == RoomNode.RoomType.RoomDoor) return NodeType.Door;
+		if (dataGenerator.GetNode(pos).NodeType == RoomNode.RoomType.RoomDoor) return NodeRoomType.Door;
 
 		// else - Check the node's neightbor
 		var neighborhood = dataGenerator.GetNeighborhood(pos);
@@ -305,16 +360,10 @@ public class ModelGenerator
 
 		}
 
-		NodeType nodeType = NodeType.Cardinal;
-		if (validNodes.Count == 3) nodeType = NodeType.Corner;
+		NodeRoomType nodeType = NodeRoomType.Cardinal;
+		if (validNodes.Count == 3) nodeType = NodeRoomType.Corner;
 		return nodeType;
 	}
-
-	private void SpawnDoor(RoomNode node)
-	{
-
-	}
-
 
 	private void SpawnPremadeRooms() // For premade rooms
 	{
@@ -347,7 +396,8 @@ public class ModelGenerator
 		North,
 		East,
 		South,
-		West
+		West,
+		None
 	}
 
 	private enum CornerDirection
@@ -358,7 +408,7 @@ public class ModelGenerator
 		NorthWest
 	}
 
-	private enum NodeType
+	private enum NodeRoomType
 	{
 		/// <summary>
 		/// North, East, South, West

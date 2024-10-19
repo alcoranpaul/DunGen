@@ -46,8 +46,8 @@
 			}
 		},
 		"Bloom": {
-			"OverrideFlags": 1,
-			"Enabled": false,
+			"OverrideFlags": 0,
+			"Enabled": true,
 			"Intensity": 1.0,
 			"Threshold": 3.0,
 			"BlurSigma": 4.0,
@@ -187,14 +187,14 @@
 			"LutWeight": 1.0
 		},
 		"EyeAdaptation": {
-			"OverrideFlags": 0,
-			"Mode": 2,
+			"OverrideFlags": 1,
+			"Mode": 0,
 			"SpeedUp": 3.0,
 			"SpeedDown": 10.0,
 			"PreExposure": 0.0,
 			"PostExposure": 0.0,
 			"MinBrightness": 0.03,
-			"MaxBrightness": 15.0,
+			"MaxBrightness": 1.0,
 			"HistogramLowPercent": 70.0,
 			"HistogramHighPercent": 90.0
 		},
