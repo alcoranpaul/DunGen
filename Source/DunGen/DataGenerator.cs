@@ -61,7 +61,6 @@ public class DataGenerator // WhatIf: use dependency injection rather than Singl
 	public void GenerateDungeonData()
 	{
 		ChangeState(DungeonGenState.Generating);
-
 		GeneratePathfinding();
 
 		DestroyData();

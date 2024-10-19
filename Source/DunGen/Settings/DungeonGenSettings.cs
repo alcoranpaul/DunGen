@@ -10,7 +10,7 @@ namespace DunGen;
 public class DungeonGenSettings
 {
 	public int MaxRooms = 10;
-	public float Size = 10f;
+	public float Size = 50f;
 	[HideInEditor] public BoundingBox BoundingBox;
 	public DebugSettings DebugSetting;
 

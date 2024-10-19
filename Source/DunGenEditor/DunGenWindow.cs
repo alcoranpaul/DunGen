@@ -27,10 +27,12 @@ public class DunGenWindow : CustomEditorWindow
 	public string ROOM_FLOOR_PREFAB = "RoomFloor";
 	public string ROOM_DOOR_FLOOR_PREFAB = "RoomDoorFloor";
 	public string ROOM_MATERIAL_NAME = "Debug Rooms";
+
 	public string ROOM_NWALL_PREFAB = "NWallPrefab";
 	public string ROOM_SWALL_PREFAB = "SWallPrefab";
 	public string ROOM_EWALL_PREFAB = "EWallPrefab";
 	public string ROOM_WWALL_PREFAB = "WWallPrefab";
+
 	public string ROOM_NDOOR_WALL_PREFAB = "NDoorWallPrefab";
 	public string ROOM_SDOOR_WALL_PREFAB = "SDoorWallPrefab";
 	public string ROOM_EDOOR_WALL_PREFAB = "EDoorWallPrefab";

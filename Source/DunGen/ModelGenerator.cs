@@ -107,6 +107,7 @@ public class ModelGenerator
 			{
 				case RoomNode.RoomType.Room:
 					floor = PrefabManager.SpawnPrefab(Settings.DebugSetting.RoomFloorPrefab, pos, Quaternion.Identity);
+
 					break;
 				case RoomNode.RoomType.Floor:
 					floor = PrefabManager.SpawnPrefab(Settings.DebugSetting.HallwayFloorPrefab, pos, Quaternion.Identity);
@@ -119,10 +120,12 @@ public class ModelGenerator
 
 					break;
 			}
+
 			if (floor != null)
 				floor.Parent = dungeonGenActor;
-
 		}
+
+
 	}
 
 	private void SpawnFloorWalls(GridSystem.GridPosition gridPos)
