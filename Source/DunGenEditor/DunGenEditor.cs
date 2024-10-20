@@ -15,19 +15,36 @@ namespace DunGenEditor;
 
 public class DunGenEditor : EditorPlugin
 {
+	public static bool IsInDebug = true; // True when plugin is in development. Set to False when using plugin for production
+
 	public static readonly string SETTINGS_NAME = "DunGenSettings";
-	public static readonly string SETTINGS_PATH_FOLDER = "/Data";
-	public static readonly string DEBUG_PREFAB_FOLDER = "/Debugging";
-	public static string DebugPath => Path.Combine(Globals.ProjectContentFolder + DEBUG_PREFAB_FOLDER);
-	public static string SettingsPath => Path.Combine(Globals.ProjectContentFolder + SETTINGS_PATH_FOLDER, SETTINGS_NAME + ".json");
+	public static readonly string SETTINGS_PATH_FOLDER = "Data";
+	public static readonly string DEBUG_PREFAB_FOLDER = "Debugging";
+	public static string DebugPath
+	{
+		get
+		{
+			if (IsInDebug)
+				return Path.Combine(Globals.ProjectContentFolder, DEBUG_PREFAB_FOLDER);
+			else
+				return Path.Combine(Globals.ProjectFolder, "Plugins", "DunGen", DEBUG_PREFAB_FOLDER, "Debug");
+		}
+	}
+	public static string SettingsPath
+	{
+		get
+		{
+			if (IsInDebug)
+				return Path.Combine(Globals.ProjectContentFolder, SETTINGS_PATH_FOLDER, SETTINGS_NAME + ".json");
+			else
+				return Path.Combine(Globals.ProjectFolder, "Plugins", "DunGen", SETTINGS_PATH_FOLDER, SETTINGS_NAME + ".json");
+		}
+	}
 
 
 
 
 	private ToolStripButton _button;
-
-
-	private bool isWindowShown;
 
 	public DunGenEditor()
 	{
@@ -51,8 +68,6 @@ public class DunGenEditor : EditorPlugin
 	{
 		base.InitializeEditor();
 
-
-		isWindowShown = false;
 		_button = Editor.UI.ToolStrip.AddButton("DunGen");
 		// if (dunGenWindow == null)
 		// 	dunGenWindow = new DunGenWindow(_description);
@@ -72,9 +87,6 @@ public class DunGenEditor : EditorPlugin
 
 		if (Editor.Instance.Windows.ToolboxWin.ParentDockPanel.TabsCount > 1)
 			Editor.Instance.Windows.ToolboxWin.ParentDockPanel.SelectTab(1);
-
-
-		isWindowShown = true;
 	}
 
 	/// <inheritdoc />
@@ -88,5 +100,7 @@ public class DunGenEditor : EditorPlugin
 		}
 		base.DeinitializeEditor();
 	}
+
+
 }
 #endif
