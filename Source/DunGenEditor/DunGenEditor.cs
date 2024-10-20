@@ -15,7 +15,7 @@ namespace DunGenEditor;
 
 public class DunGenEditor : EditorPlugin
 {
-	public static bool IsInDebug = true; // True when plugin is in development. Set to False when using plugin for production
+	public static bool IsInDebug = false; // True when plugin is in development. Set to False when using plugin for production
 
 	public static readonly string SETTINGS_NAME = "DunGenSettings";
 	public static readonly string SETTINGS_PATH_FOLDER = "Data";
@@ -27,7 +27,7 @@ public class DunGenEditor : EditorPlugin
 			if (IsInDebug)
 				return Path.Combine(Globals.ProjectContentFolder, DEBUG_PREFAB_FOLDER);
 			else
-				return Path.Combine(Globals.ProjectFolder, "Plugins", "DunGen", DEBUG_PREFAB_FOLDER, "Debug");
+				return Path.Combine(Globals.ProjectFolder, "Plugins", "DunGen", "Content", DEBUG_PREFAB_FOLDER, "Debug");
 		}
 	}
 	public static string SettingsPath
@@ -37,7 +37,7 @@ public class DunGenEditor : EditorPlugin
 			if (IsInDebug)
 				return Path.Combine(Globals.ProjectContentFolder, SETTINGS_PATH_FOLDER, SETTINGS_NAME + ".json");
 			else
-				return Path.Combine(Globals.ProjectFolder, "Plugins", "DunGen", SETTINGS_PATH_FOLDER, SETTINGS_NAME + ".json");
+				return Path.Combine(Globals.ProjectFolder, "Plugins", "DunGen", "Content", SETTINGS_PATH_FOLDER, SETTINGS_NAME + ".json");
 		}
 	}
 
