@@ -27,7 +27,7 @@ public class DunGenEditor : EditorPlugin
 			if (IsInDebug)
 				return Path.Combine(Globals.ProjectContentFolder, DEBUG_PREFAB_FOLDER);
 			else
-				return Path.Combine(Globals.ProjectFolder, "Plugins", "DunGen", "Content", DEBUG_PREFAB_FOLDER, "Debug");
+				return Path.Combine(Globals.ProjectFolder, "Plugins", "DunGen", "Content", DEBUG_PREFAB_FOLDER);
 		}
 	}
 	public static string SettingsPath
