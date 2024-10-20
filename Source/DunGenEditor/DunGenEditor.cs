@@ -40,7 +40,7 @@ public class DunGenEditor : EditorPlugin
 			HomepageUrl = $"https://github.com/alcoranpaul",
 			RepositoryUrl = $"https://github.com/alcoranpaul/DunGen",
 			Description = "Editor for DunGen",
-			Version = new Version(0, 2),
+			Version = new Version(1, 0),
 			IsAlpha = true,
 			IsBeta = false,
 
