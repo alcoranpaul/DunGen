@@ -1,0 +1,11 @@
+{
+	"ID": "d035ef884b5f10141eb86ab487b6a859",
+	"TypeName": "DunGen.RoomSettings",
+	"EngineBuild": 6605,
+	"Data": {
+	"RoomPrefabs": {
+		"Room": null,
+		"Floor": null
+	}
+}
+}

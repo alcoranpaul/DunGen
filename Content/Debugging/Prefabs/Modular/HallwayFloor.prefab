@@ -1,0 +1,35 @@
+{
+	"ID": "3e10e49441a0137931b654a1c18b11b7",
+	"TypeName": "FlaxEngine.Prefab",
+	"EngineBuild": 6605,
+	"Data": [
+	{
+		"ID": "794bb1a24eb71e116a2c4b8396e9cb9a",
+		"TypeName": "FlaxEngine.EmptyActor",
+		"Name": "Floor"
+	},
+	{
+		"ID": "1e363a074d35ce1e684fafbbdc209a76",
+		"TypeName": "FlaxEngine.StaticModel",
+		"ParentID": "794bb1a24eb71e116a2c4b8396e9cb9a",
+		"Name": "SM_Floor",
+		"Model": "ad6212574c580a304ef7fb89f495a865",
+		"Buffer": {
+			"Entries": [
+				{
+					"Material": "00000000000000000000000000000000",
+					"ShadowsMode": 0,
+					"Visible": true,
+					"ReceiveDecals": false
+				},
+				{
+					"Material": "1e334af844271e5a505b0c9650e7bd67",
+					"ShadowsMode": 0,
+					"Visible": true,
+					"ReceiveDecals": false
+				}
+			]
+		}
+	}
+]
+}

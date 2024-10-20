@@ -1,0 +1,31 @@
+{
+	"Name": "DunGen",
+	"Version": "1.0",
+	"Company": "",
+	"Copyright": "",
+	"GameTarget": "DunGenTarget",
+	"EditorTarget": "DunGenEditorTarget",
+	"References": [
+		{
+			"Name": "$(EnginePath)/Flax.flaxproj"
+		},
+		{
+			"Name": "$(ProjectPath)/Plugins/GridSystem/GridSystem.flaxproj"
+		}
+	],
+	"DefaultScene": "0ebbdfb64061f4449ec058918c912312",
+	"DefaultSceneSpawn": {
+		"Position": {
+			"X": -1807.4651,
+			"Y": 279.89377,
+			"Z": 461.8437
+		},
+		"Direction": {
+			"X": 0.04084073,
+			"Y": -0.19732493,
+			"Z": -0.9794869
+		}
+	},
+	"MinEngineVersion": "0.0.6167",
+	"EngineNickname": null
+}

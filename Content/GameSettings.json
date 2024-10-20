@@ -1,0 +1,39 @@
+{
+	"ID": "b977939b436cc20f2cc674aaf1c1cd78",
+	"TypeName": "FlaxEditor.Content.Settings.GameSettings",
+	"EngineBuild": 6605,
+	"Data": {
+	"ProductName": "DunGen",
+	"CompanyName": "D1g1Talino",
+	"CopyrightNotice": null,
+	"Icon": null,
+	"FirstScene": "00000000000000000000000000000000",
+	"NoSplashScreen": false,
+	"SplashScreen": null,
+	"Time": null,
+	"Audio": null,
+	"LayersAndTags": null,
+	"Physics": null,
+	"Input": null,
+	"Graphics": "fbcf9b564d65c60e089de1b538023dc2",
+	"Network": null,
+	"Navigation": null,
+	"Localization": null,
+	"GameCooking": null,
+	"Streaming": null,
+	"CustomSettings": {
+		"DunGenSettings": "b2ff838a432eca911591b1b326d49560"
+	},
+	"WindowsPlatform": null,
+	"UWPPlatform": null,
+	"LinuxPlatform": null,
+	"PS4Platform": null,
+	"XboxOnePlatform": null,
+	"XboxScarlettPlatform": null,
+	"AndroidPlatform": null,
+	"SwitchPlatform": null,
+	"PS5Platform": null,
+	"MacPlatform": null,
+	"iOSPlatform": null
+}
+}
