@@ -184,13 +184,12 @@ public class DunGenWindow : CustomEditorWindow
 		if (asset == null)
 		{
 			Debug.LogWarning($"Failed to load asset @ {DunGenEditor.SettingsPath} ");
-			return null;
-
+			CreateSettings();
+			asset = Content.Load(DunGenEditor.SettingsPath);
 		}
-
 		if (asset is not JsonAsset)
 		{
-			Debug.LogWarning($"Settings @ {DunGenEditor.SettingsPath} is not a JsonAsset");
+			Debug.LogError($"Settings @ {DunGenEditor.SettingsPath} is not a JsonAsset");
 			return null;
 		}
 		JsonAsset json = asset as JsonAsset;
@@ -308,26 +307,12 @@ public class DunGenWindow : CustomEditorWindow
 
 	}
 
-	private void UpdatePlugin()
-	{
-
-	}
-
 	private void OpenData()
 	{
 		var asset = Content.Load(DunGenEditor.SettingsPath);
 		if (asset == null) // If the asset is not found, create a new settings file
 		{
-			string path = $"../Content{DunGenEditor.SETTINGS_PATH_FOLDER}/{DunGenEditor.SETTINGS_NAME}.json";
-			Debug.LogWarning($"Failed to load settings @ {DunGenEditor.SettingsPath} ");
-
-			DungeonGenSettings settings = new DungeonGenSettings();
-			settings.DebugSetting = GetDebugSettings();
-
-			Editor.SaveJsonAsset(DunGenEditor.SettingsPath, settings);
-			GameSettings.SetCustomSettings(DunGenEditor.SETTINGS_NAME, Content.LoadAsync<JsonAsset>(DunGenEditor.SettingsPath));
-
-			MessageBox.Show($"Newly created settings @ {path}\n You can now open settings via the DunGen Window");
+			CreateSettings();
 			return;
 		}
 
@@ -336,6 +321,20 @@ public class DunGenWindow : CustomEditorWindow
 		// Open the settings asset in the editor
 		Editor.Instance.ContentEditing.Open(asset);
 
+	}
+
+	private void CreateSettings()
+	{
+		string path = $"../Content{DunGenEditor.SETTINGS_PATH_FOLDER}/{DunGenEditor.SETTINGS_NAME}.json";
+		Debug.LogWarning($"Failed to load settings @ {DunGenEditor.SettingsPath} ");
+
+		DungeonGenSettings settings = new DungeonGenSettings();
+		settings.DebugSetting = GetDebugSettings();
+
+		Editor.SaveJsonAsset(DunGenEditor.SettingsPath, settings);
+		GameSettings.SetCustomSettings(DunGenEditor.SETTINGS_NAME, Content.LoadAsync<JsonAsset>(DunGenEditor.SettingsPath));
+
+		MessageBox.Show($"Newly created settings @ {path}\n You can now open settings via the DunGen Window");
 	}
 
 	// private void RefreshSettings()
