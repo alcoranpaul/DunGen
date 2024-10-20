@@ -25,7 +25,7 @@ namespace DunGen
 				HomepageUrl = "https://github.com/alcoranpaul/DunGen",
 				RepositoryUrl = "https://github.com/alcoranpaul/DunGen",
 				Description = "Procedural Dungeon Generator",
-				Version = new Version(0, 1),
+				Version = new Version(0, 2),
 				IsAlpha = true,
 				IsBeta = false,
 
