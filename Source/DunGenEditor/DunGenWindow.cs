@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using DunGen;
 using FlaxEditor;
 using FlaxEditor.Content;
@@ -46,25 +47,30 @@ public class DunGenWindow : CustomEditorWindow
 
 	public bool EnableDebugDraw = false;
 	public DebugDrawType _DebugDrawType;
-	private readonly string repoURL = "";
+
 
 	private DataGenerator dataGenerator;
 	private ModelGenerator modelGenerator;
 	private DungeonGenSettings dunGenSettings;
+	private Task _task;
 
 
-	public DunGenWindow(PluginDescription description)
-	{
-		// Debug.Log($"DunGenWindow Constructor");
-		repoURL = description.RepositoryUrl;
-
-	}
 	public override void Initialize(LayoutElementsContainer layout)
 	{
+		if (Window == null) // So that it does not double initialize
+			return;
+
 		// Debug.Log($"DunGenWindow Initialized");
 		// if (generator == null)
 		// 	generator = new Generator();
 		dunGenSettings = GetInstanceSettings();
+		if (dunGenSettings.MaxRooms <= 2)
+		{
+			MessageBox.Show("Max Rooms is less than 2, value will be set to the minimum acceptable number (which is 3)\nOpening Settings...", "Invalid Max Rooms", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+			dunGenSettings.MaxRooms = 3;
+			SaveToSettings();
+		}
+
 		layout.Label("Dungeon Generation (DunGen)", TextAlignment.Center);
 		layout.Space(20);
 
@@ -122,6 +128,12 @@ public class DunGenWindow : CustomEditorWindow
 		githubButton.Button.Clicked += OpenGitHub;
 		githubButton.Button.TextColor = Color.Black;
 		githubButton.Button.TextColorHighlighted = Color.Black;
+
+		layout.Space(10);
+		var updateButton = layout.Button("Check for Updates", Color.DarkKhaki);
+		updateButton.Button.Clicked += CheckForGitHubUpdate;
+		updateButton.Button.TextColor = Color.Black;
+		updateButton.Button.TextColorHighlighted = Color.Black;
 	}
 
 	private void CreateSettingsGroup(LayoutElementsContainer layout)
@@ -187,6 +199,14 @@ public class DunGenWindow : CustomEditorWindow
 	}
 	private void GenerateFinalDungeon()
 	{
+		if (dunGenSettings.MaxRooms <= 2)
+		{
+			MessageBox.Show("Max Rooms is less than 2, value will be set to the minimum acceptable number (which is 3)\nOpening Settings...", "Invalid Max Rooms", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+			dunGenSettings.MaxRooms = 3;
+			SaveToSettings();
+			return;
+		}
+
 		DebugDraw.UpdateContext(IntPtr.Zero, float.MaxValue);
 		dunGenSettings = GetInstanceSettings();
 		if (dataGenerator == null)
@@ -249,14 +269,39 @@ public class DunGenWindow : CustomEditorWindow
 
 
 
+	private void CheckForGitHubUpdate()
+	{
+		var gamePlugin = PluginManager.GetPlugin("DunGen");
+		if (gamePlugin == null) Debug.LogError("Plugin is null");
+		PluginDescription pluginDescription = gamePlugin.Description;
 
+		_task = Task.Run(async () =>
+		{
+			var latestRelease = await GithubFetcher.FetchLatestReleaseAsync(pluginDescription.Author, PluginManager.GetPlugin("DunGen").Description.Name);
+			if (!string.IsNullOrEmpty(latestRelease))
+			{
+				var version = new Version(latestRelease);
+				bool isSameVersion = version.Major == pluginDescription.Version.Major && version.Minor == pluginDescription.Version.Minor;
+				if (isSameVersion)
+					MessageBox.Show($"You are up to date with the latest release: {latestRelease}", "No Updates", MessageBoxButtons.OK, MessageBoxIcon.Information);
+				else
+					MessageBox.Show($"A new release is available: {latestRelease}", "Update Available", MessageBoxButtons.OK, MessageBoxIcon.Information);
+			}
+		});
+
+	}
 	private void OpenGitHub()
 	{
+		var gamePlugin = PluginManager.GetPlugin("DunGen");
+		if (gamePlugin == null) Debug.LogError("Plugin is null");
+
+		PluginDescription pluginDescription = gamePlugin.Description;
 		CreateProcessSettings settings = new CreateProcessSettings();
-		settings.FileName = repoURL;
+		settings.FileName = pluginDescription.RepositoryUrl;
 		settings.ShellExecute = true;
 		settings.LogOutput = false;
 		settings.WaitForEnd = false;
+
 
 		Platform.CreateProcess(ref settings);
 
@@ -265,27 +310,7 @@ public class DunGenWindow : CustomEditorWindow
 
 	private void UpdatePlugin()
 	{
-		// TODO: Implement the update process
-		// Define the URL and the output file path
-		string url = "https://raw.githubusercontent.com/username/repo/branch/file.txt";
-		string savePath = "C:/Your/Desired/Path/file.txt";
 
-		// Set up the CreateProcessSettings for the curl command
-		var settings = new CreateProcessSettings
-		{
-			FileName = "curl",  // Use 'curl' for downloading files
-			Arguments = $"-o \"{savePath}\" \"{url}\"",  // Arguments for saving the file
-			WorkingDirectory = "",  // You can set the working directory or leave it empty
-			LogOutput = true,  // Print the process output to the Flax log
-			SaveOutput = false,  // Don't save the process output into the Output array
-			WaitForEnd = true,  // Wait for the process to finish before proceeding
-			HiddenWindow = true,  // Hide the window (supported on Windows only)
-			ShellExecute = false,  // Don't use the operating system shell
-								   // Environment = new Dictionary<string, string>()  // You can set custom environment variables here if needed
-		};
-
-		// Run the process
-		Platform.CreateProcess(ref settings);
 	}
 
 	private void OpenData()

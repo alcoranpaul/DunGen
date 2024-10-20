@@ -12,7 +12,7 @@ namespace DunGen
 	/// <seealso cref="GamePlugin" />
 	public class DunGen : GamePlugin
 	{
-		// public DataGenerator Generator { get; private set; }
+		public int test;
 		/// <inheritdoc />
 		public DunGen()
 		{
@@ -20,7 +20,7 @@ namespace DunGen
 			{
 				Name = "DunGen",
 				Category = "Procedural",
-				Author = "D1g1Talino",
+				Author = "alcoranpaul",
 				AuthorUrl = "https://github.com/alcoranpaul/DunGen",
 				HomepageUrl = "https://github.com/alcoranpaul/DunGen",
 				RepositoryUrl = "https://github.com/alcoranpaul/DunGen",

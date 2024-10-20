@@ -1,24 +1,24 @@
 {
-	"ID": "11f393734c22d6d77b6f9fb8d79f261e",
+	"ID": "b2ff838a432eca911591b1b326d49560",
 	"TypeName": "DunGen.DungeonGenSettings",
 	"EngineBuild": 6605,
 	"Data": {
-	"MaxRooms": 12,
+	"MaxRooms": 3,
 	"Size": 50.0,
 	"BoundingBox": {
 		"Minimum": {
-			"X": 0.0,
+			"X": -2450.0,
 			"Y": 0.0,
-			"Z": 0.0
+			"Z": -2450.0
 		},
 		"Maximum": {
-			"X": 0.0,
+			"X": 2550.0,
 			"Y": 0.0,
-			"Z": 0.0
+			"Z": 2550.0
 		}
 	},
 	"DebugSetting": {
-		"Material": "060bffd84e54a36130b71e95c736e6cf",
+		"Material": "b6cea96a4906b0b6a0f5a0b326252c47",
 		"DebugGridPrefab": "ee36236c42c3ab7ccb8988b493f6974a",
 		"PathfindingDebugPrefab": "b71b10e044f0a7eb83c1a99fda4c90a1",
 		"RoomPrefab": "f3d896034ca9a3f0966afe81c047c45e",
@@ -40,12 +40,18 @@
 	},
 	"RoomSetting": {
 		"IsRandomDimension": true,
-		"MinWidth": 5,
-		"MaxWidth": 10,
-		"MinHeight": 5,
-		"MaxHeight": 10,
-		"MinLength": 5,
-		"MaxLength": 10
+		"WidthDimension": {
+			"X": 5.0,
+			"Y": 10.0
+		},
+		"HeightDimension": {
+			"X": 1.0,
+			"Y": 2.0
+		},
+		"LengthDimension": {
+			"X": 5.0,
+			"Y": 10.0
+		}
 	}
 }
 }
